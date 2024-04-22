@@ -1,16 +1,11 @@
 import os
+import time
 import chromadb
+from langchain_community.document_loaders import DirectoryLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
 import config
 import gradio as gr
-from llama_index.core import (
-    VectorStoreIndex,
-    SimpleDirectoryReader,
-    StorageContext,
-)
-from llama_index.core.node_parser import SentenceSplitter
-from llama_index.vector_stores.chroma import ChromaVectorStore
-from llama_index.core.memory import ChatMemoryBuffer
-from llama_index.core import Settings
 from langchain_community.llms import DeepInfra
 from langchain_community.embeddings import DeepInfraEmbeddings
 
@@ -26,33 +21,14 @@ def initiate_db():
     return chroma_collection
 
 
-def load_documents(directory=config.DATA_PATH):
-    if not os.path.exists(CHROMA_DIR):
-        print("Creating index...")
-
-        documents = SimpleDirectoryReader(directory).load_data()
-        chroma_collection = initiate_db()
-        vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
-        storage_context = StorageContext.from_defaults(vector_store=vector_store)
-        index = VectorStoreIndex.from_documents(
-            documents, storage_context=storage_context, transformations=[text_splitter]
-        )
-    else:
-        print("Index found, loading...")
-        chroma_collection = initiate_db()
-        vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
-        index = VectorStoreIndex.from_vector_store(
-            vector_store,
-        )
-    print(index)
-    return index
-
-
-def chatbot(input_text, history):
-    memory = ChatMemoryBuffer.from_defaults(token_limit=3900)
-    response = index.as_chat_engine(chat_mode="condense_plus_context", memory=memory, verbose=False).chat(input_text)
-
-    return response.response
+def load_documents(directory=DATA_PATH):
+    loader = DirectoryLoader(directory)
+    documents = loader.load()
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1024, chunk_overlap=100, add_start_index=True
+    )
+    split_docs = text_splitter.split_documents(documents)
+    return split_docs
 
 
 if __name__ == '__main__':
@@ -61,19 +37,40 @@ if __name__ == '__main__':
         "temperature": 0.7,
         "top_p": 0.9,
     }
-    Settings.llm = llm
 
     embeddings = DeepInfraEmbeddings(
         model_id=config.EMBEDDING_MODEL,
         query_instruction="",
         embed_instruction="",
     )
-    Settings.embed_model = embeddings
+    start = time.time()
+    split_docs = load_documents('using_files/data')
+    for doc in split_docs:
+        print(doc)
+    end = time.time()
+    print(f"数据切分时间：{(end - start) / 60 % 60:.4f}分({end - start:.4f}秒)")
 
-    Settings.chunk_size = 1024
-    text_splitter = SentenceSplitter(chunk_size=1024, chunk_overlap=100)
-    Settings.text_splitter = text_splitter
+    chroma_collection = initiate_db()
 
-    index = load_documents()
-    chat = gr.ChatInterface(fn=chatbot, title=TITLE + " ChatBot")
-    chat.launch(share=False, server_name='0.0.0.0', ssl_verify=False)
+    # start_embedding = time.time()
+    # embedded_docs = []
+    # i = 0
+    # for doc in split_docs:
+    #     doc_list = [doc.page_content]
+    #     print(doc_list)
+    #     embeddings_list = embeddings.embed_documents(doc_list)
+    #     embedded_docs.append({
+    #         "id": str(i),
+    #         "text": doc.page_content,
+    #         "embedding": embeddings_list[0]
+    #     })
+    #     i += 1
+    # print(embedded_docs)
+    # end_embedding = time.time()
+    # print(f"嵌入时间：{(end_embedding - start_embedding) / 60 % 60:.4f}分({end_embedding - start_embedding:.4f}秒)")
+    #
+    # start_indexing = time.time()
+    # for doc in embedded_docs:
+    #         chroma_collection.add(ids=[doc['id']], documents=[doc['text']], embeddings=[doc['embedding']])
+    # end_indexing = time.time()
+    # print(f"索引时间：{(end_indexing - start_indexing) / 60 % 60:.4f}分({end_indexing - start_indexing:.4f}秒)")
