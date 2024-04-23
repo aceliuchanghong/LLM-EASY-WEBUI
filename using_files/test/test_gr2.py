@@ -51,24 +51,27 @@ def bot(history):
     yield history
 
 
-with gr.Blocks() as demo:
-    chatbot = gr.Chatbot(
-        [],
-        elem_id="chatbot",
-        avatar_images=(None, (os.path.join(os.path.dirname(__file__), "../img", "avatar.jpg"))),
-        bubble_full_width=False,
-        height="800px",
-    )
+def create_app():
+    with gr.Blocks() as demo:
+        chatbot = gr.Chatbot(
+            [],
+            elem_id="chatbot",
+            avatar_images=(None, (os.path.join(os.path.dirname(__file__), "../img", "avatar.jpg"))),
+            bubble_full_width=False,
+            height="800px",
+        )
 
-    chat_input = gr.MultimodalTextbox(interactive=True, file_types=["image"],
-                                      placeholder="输入聊天信息或者上传文件...", show_label=False)
+        chat_input = gr.MultimodalTextbox(interactive=True, file_types=["image"],
+                                          placeholder="输入聊天信息或者上传文件...", show_label=False)
 
-    chat_msg = chat_input.submit(add_message, [chatbot, chat_input], [chatbot, chat_input])
-    bot_msg = chat_msg.then(bot, chatbot, chatbot, api_name="bot_response")
-    bot_msg.then(lambda: gr.MultimodalTextbox(interactive=True), None, [chat_input])
+        chat_msg = chat_input.submit(add_message, [chatbot, chat_input], [chatbot, chat_input])
+        bot_msg = chat_msg.then(bot, chatbot, chatbot, api_name="bot_response")
+        bot_msg.then(lambda: gr.MultimodalTextbox(interactive=True), None, [chat_input])
 
-    chatbot.like(print_like_dislike, None, None)
+        chatbot.like(print_like_dislike, None, None)
+    return demo
 
-demo.queue()
+
 if __name__ == "__main__":
-    demo.launch()
+    app = create_app()
+    app.launch(share=False)
