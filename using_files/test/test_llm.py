@@ -5,11 +5,12 @@ DEEPINFRA_API_KEY = os.getenv('DEEPINFRA_API_KEY')
 
 
 class ChatCompletion:
-    def __init__(self, temperature, model, api_key, base_url, stream=False):
+    def __init__(self, temperature, model, api_key, base_url, max_tokens=51200, stream=False):
         self.temperature = temperature
         self.model = model
         self.openai = OpenAI(api_key=api_key, base_url=base_url)
         self.stream = stream
+        self.max_tokens = max_tokens
 
     def __call__(self, prompt):
         messages = [{"role": "user", "content": prompt}]
@@ -18,6 +19,7 @@ class ChatCompletion:
             messages=messages,
             temperature=self.temperature,
             stream=self.stream,
+            max_tokens=self.max_tokens
         )
         return response
 
