@@ -5,17 +5,23 @@ from using_files.test.test_llm import ChatCompletion
 
 DEEPINFRA_API_KEY = os.getenv('DEEPINFRA_API_KEY')
 
-llm = ChatCompletion(temperature=0.7, model="meta-llama/Meta-Llama-3-70B-Instruct",
-                     api_key=DEEPINFRA_API_KEY, base_url="https://api.deepinfra.com/v1/openai", stream=True)
+llm = ChatCompletion(
+    temperature=0.7,
+    model="meta-llama/Meta-Llama-3-70B-Instruct",
+    api_key=DEEPINFRA_API_KEY,
+    base_url="https://api.deepinfra.com/v1/openai",
+    stream=True
+)
 
 chat_history = []
 
 
 def generate_text(history, txt):
     history.append(("User", txt))
-    response = llm("\n".join([f"{turn[0]}: {turn[1]}" for turn in history]))
-    for event in response:
+    responses = llm("\n".join([f"{turn[0]}: {turn[1]}" for turn in history]))
+    for event in responses:
         history.append(("Assistant", event.choices[0].delta.content))
+    print(history)
     return "", history
 
 
@@ -25,22 +31,6 @@ def generate_image(history, file):
     response = "文件上传成功"
     history.append(("Assistant", response))
     return "", history
-
-
-def bot(history):
-    message = history[-1][1]  # 取最后一条消息的内容
-    if isinstance(message, tuple):
-        response = "文件上传成功"
-    else:
-        prev_history = [f"{turn[0]}: {turn[1]}" for turn in history[:-1]]
-        prompt = "\n".join(prev_history) + f"\nUser: {message}"
-        response_stream = llm(prompt)
-        responses = []
-        for event in response_stream:
-            responses.append(event.choices[0].delta.content)
-        response = "\n".join(responses)
-    history.append(("Assistant", response))
-    return response
 
 
 def clear_history():
