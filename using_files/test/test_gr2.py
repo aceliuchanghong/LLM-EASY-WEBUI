@@ -20,7 +20,7 @@ def print_like_dislike(x: gr.LikeData):
 
 
 def add_message(history, message):
-    print(history)
+    # print(history)
     for x in message["files"]:
         history.append(((x,), None))
     if message["text"] is not None:
@@ -43,12 +43,12 @@ def bot(history):
                 prompt += "Assistant: \n"  # or some other default value
     print("prompt:\n" + prompt)
     response = llm(prompt).choices[0].message.content
-    history.append((None, response))
+    history.append(("", ""))  # Append an empty response to the history
     for character in response:
-        history[-1] = (None, history[-1][1] + character)
-        time.sleep(0.05)
-    print(history)  # Only print the final history list
-    return history
+        history[-1] = (history[-1][0], history[-1][1] + character)  # Update the last element of the history
+        time.sleep(0.02)  # Simulate typing effect
+        yield history
+    yield history
 
 
 with gr.Blocks() as demo:
