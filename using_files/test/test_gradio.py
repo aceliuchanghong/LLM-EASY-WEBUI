@@ -14,7 +14,6 @@ chat_history = []
 def generate_text(history, txt):
     history.append(("User", txt))
     response = bot(history)
-    history.append(("Assistant", response))
     return "", history
 
 
@@ -22,7 +21,6 @@ def generate_image(history, file):
     img = file
     history.append(("User", img))
     response = "文件上传成功"
-    history.append(("Assistant", response))
     return "", history
 
 
@@ -36,6 +34,7 @@ def bot(history):
         response = llm(prompt).choices[0].message.content
         input_data = {"history": history, "prompt": prompt}
         print(input_data)
+    history.append(("Assistant", response))
     return response
 
 
