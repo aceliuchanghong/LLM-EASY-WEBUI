@@ -29,6 +29,10 @@ def add_message(history, message):
 
 
 def bot(history):
+    # print('history:' + str(len(history)) + "\n")
+    print(history)
+    if len(history) > 7:  # Clear history if it exceeds 7 messages
+        history = [['聊天记录过长已清除,以中文回答以下问题:', None]]
     prompt = ""
     for i, item in enumerate(history):
         if i % 2 == 0:  # User message (even indices)
@@ -42,6 +46,9 @@ def bot(history):
             else:
                 prompt += "Assistant: \n"  # or some other default value
     print("prompt:\n" + prompt)
+    # print('prompt:' + str(len(prompt)) + "\n")
+    if len(prompt) > 5000:  # Clear history if it exceeds 7 messages
+        prompt = '聊天记录过长已清除,给我讲一个简短笑话吧'
     response = llm(prompt).choices[0].message.content
     history.append(("", ""))  # Append an empty response to the history
     for character in response:
