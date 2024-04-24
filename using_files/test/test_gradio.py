@@ -63,12 +63,12 @@ def create_app():
             elem_id="chatbot",
             avatar_images=(None, (os.path.join(os.path.dirname(__file__), "../img", "avatar.jpg"))),
             bubble_full_width=False,
-            height="800px",
+            height="700px",
         )
         with gr.Row():
             chat_input = gr.MultimodalTextbox(scale=10, interactive=True, file_types=["image"],
                                               placeholder="输入聊天信息或者上传文件...", show_label=False)
-            btn_clear_his = gr.Button(scale=2, value="Clear", variant="secondary")
+            btn_clear_his = gr.Button(scale=2, value="清空聊天历史", variant="secondary")
 
             chat_msg = chat_input.submit(add_message, [chatbot, chat_input], [chatbot, chat_input])
             bot_msg = chat_msg.then(bot, chatbot, chatbot, api_name="bot_response")
@@ -81,4 +81,7 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-    app.launch(share=False)
+    # 局域网访问
+    app.launch(server_name="0.0.0.0", server_port=7860, share=True)
+    # 仅本机
+    # app.launch(share=False)
