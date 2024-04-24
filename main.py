@@ -1,24 +1,37 @@
+import gradio as gr
 import os
-import time
-import chromadb
+
 from langchain_community.document_loaders import DirectoryLoader
+from langchain_community.embeddings import DeepInfraEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables import RunnablePassthrough
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 import config
-import gradio as gr
-from langchain_community.llms import DeepInfra
-from langchain_community.embeddings import DeepInfraEmbeddings
+from using_files.test.test_llm import ChatCompletion
+import time
 
-CHROMA_DIR = config.CHROMA_DIR
-DB_NAME = config.DATA_NAME
-TITLE = config.DATA_NAME
+# Load environment variables
+DEEPINFRA_API_KEY = os.getenv('DEEPINFRA_API_KEY')
+
+# Initialize the language model
+llm = ChatCompletion(
+    temperature=0.9,
+    model="meta-llama/Meta-Llama-3-70B-Instruct",
+    api_key=DEEPINFRA_API_KEY,
+    base_url="https://api.deepinfra.com/v1/openai",
+)
+
+embedding = DeepInfraEmbeddings(
+    model_id="BAAI/bge-large-en-v1.5",
+    query_instruction="",
+    embed_instruction="",
+)
+
 DATA_PATH = config.DATA_PATH
-
-
-def initiate_db():
-    db = chromadb.PersistentClient(path=CHROMA_DIR)
-    chroma_collection = db.get_or_create_collection(DB_NAME)
-    return chroma_collection
+CHROMA_DIR = config.CHROMA_DIR
 
 
 def load_documents(directory=DATA_PATH):
@@ -31,46 +44,63 @@ def load_documents(directory=DATA_PATH):
     return split_docs
 
 
-if __name__ == '__main__':
-    llm = DeepInfra(model_id=config.MODEL)
-    llm.model_kwargs = {
-        "temperature": 0.7,
-        "top_p": 0.9,
-    }
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
 
-    embeddings = DeepInfraEmbeddings(
-        model_id=config.EMBEDDING_MODEL,
-        query_instruction="",
-        embed_instruction="",
-    )
-    start = time.time()
-    split_docs = load_documents('using_files/data')
-    for doc in split_docs:
-        print(doc)
-    end = time.time()
-    print(f"数据切分时间：{(end - start) / 60 % 60:.4f}分({end - start:.4f}秒)")
 
-    chroma_collection = initiate_db()
+def get_retriever(split_docs, embedding):
+    db = Chroma.from_documents(documents=split_docs, embedding=embedding, persist_directory=CHROMA_DIR)
+    retriever = db.as_retriever()
+    print(retriever.invoke("万清平是谁?"))
+    return retriever
 
-    # start_embedding = time.time()
-    # embedded_docs = []
-    # i = 0
+
+def getChain(retriever):
+    # 修改之后的prompt模板
+    prompt = PromptTemplate.from_template("""
+    根据文本回答问题:
+    {context}
+    问题:
+    {question}
+    找不到就请回答:"DK"
+    """)
+    # chain
+    my_chain = ({"context": retriever | format_docs, "question": RunnablePassthrough()}
+                | prompt
+                | llm
+                | StrOutputParser()
+                )
+    question = "夸告矢找谁?"
+    print(my_chain.invoke({"question": question}))
+    return my_chain
+
+
+def create_chain_app():
+    # start = time.time()
+    # split_docs = load_documents('using_files/data')
     # for doc in split_docs:
-    #     doc_list = [doc.page_content]
-    #     print(doc_list)
-    #     embeddings_list = embeddings.embed_documents(doc_list)
-    #     embedded_docs.append({
-    #         "id": str(i),
-    #         "text": doc.page_content,
-    #         "embedding": embeddings_list[0]
-    #     })
-    #     i += 1
-    # print(embedded_docs)
-    # end_embedding = time.time()
-    # print(f"嵌入时间：{(end_embedding - start_embedding) / 60 % 60:.4f}分({end_embedding - start_embedding:.4f}秒)")
-    #
-    # start_indexing = time.time()
-    # for doc in embedded_docs:
-    #         chroma_collection.add(ids=[doc['id']], documents=[doc['text']], embeddings=[doc['embedding']])
-    # end_indexing = time.time()
-    # print(f"索引时间：{(end_indexing - start_indexing) / 60 % 60:.4f}分({end_indexing - start_indexing:.4f}秒)")
+    #     print(doc)
+    # end = time.time()
+    # print(f"数据切分时间：{(end - start) / 60 % 60:.4f}分({end - start:.4f}秒)")
+
+    with gr.Blocks() as demo:
+        with gr.Tab(label='Chat Tab'):
+            chatbot = gr.Chatbot(
+                [],
+                elem_id="chatbot",
+                avatar_images=(None, (os.path.join(os.path.dirname(__file__), "../img", "avatar.jpg"))),
+                bubble_full_width=False,
+                height="700px",
+            )
+            with gr.Row():
+                chat_input = gr.MultimodalTextbox(scale=10, interactive=True, file_types=["image"],
+                                                  placeholder="输入聊天信息或者上传文件...", show_label=False)
+        with gr.Tab(label='Secret Tab'):
+            img = gr.Image('using_files/img/img.png')
+
+    return demo
+
+
+if __name__ == "__main__":
+    app = create_chain_app()
+    app.launch(server_name="0.0.0.0", server_port=2333, share=False)
