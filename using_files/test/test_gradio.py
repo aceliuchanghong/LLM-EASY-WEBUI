@@ -47,8 +47,8 @@ def bot(history):
                 prompt += "Assistant: \n"  # or some other default value
     print("prompt:\n" + prompt)
     # print('prompt:' + str(len(prompt)) + "\n")
-    if len(prompt) > 5000:  # Clear history if it exceeds 7 messages
-        prompt = '聊天记录过长已清除,给我讲一个简短笑话吧'
+    if len(prompt) > 5000:
+        prompt = '用中文讲一个短笑话'
     response = llm(prompt).choices[0].message.content
     history.append(("", ""))  # Append an empty response to the history
     for character in response:
