@@ -76,13 +76,6 @@ def getChain(retriever):
 
 
 def create_chain_app():
-    # start = time.time()
-    # split_docs = load_documents('using_files/data')
-    # for doc in split_docs:
-    #     print(doc)
-    # end = time.time()
-    # print(f"数据切分时间：{(end - start) / 60 % 60:.4f}分({end - start:.4f}秒)")
-
     with gr.Blocks() as demo:
         with gr.Tab(label='Chat Tab'):
             chatbot = gr.Chatbot(
@@ -102,5 +95,12 @@ def create_chain_app():
 
 
 if __name__ == "__main__":
-    app = create_chain_app()
-    app.launch(server_name="0.0.0.0", server_port=2333, share=False)
+    # app = create_chain_app()
+    # app.launch(server_name="0.0.0.0", server_port=2333, share=False)
+    start = time.time()
+    split_docs = load_documents('using_files/data')
+    for doc in split_docs:
+        print(doc)
+    end = time.time()
+    print(f"数据切分时间：{(end - start) / 60 % 60:.4f}分({end - start:.4f}秒)")
+    retriever = get_retriever(split_docs, embedding)
