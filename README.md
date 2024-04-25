@@ -32,7 +32,10 @@ cd LLM-EASY-WEBUI
 docker build -t LLMWebUI . --build-arg DEEPINFRA_API_KEY=my_secret_key
 docker run -d --name LLMWebUI -p 80:80 LLMWebUI
 ```
-
+### 虚拟环境启动jupyter
+```shell
+jupyter notebook 
+```
 ### *Star History*
 
 ![Star History Chart](https://api.star-history.com/svg?repos=aceliuchanghong/LLM-EASY-WEBUI&type=Date)

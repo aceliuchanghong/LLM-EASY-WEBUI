@@ -35,7 +35,7 @@ CHROMA_DIR = config.CHROMA_DIR
 
 
 def load_documents(directory=DATA_PATH):
-    loader = DirectoryLoader(directory)
+    loader = DirectoryLoader(directory, show_progress=True)
     documents = loader.load()
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=1024, chunk_overlap=100, add_start_index=True
@@ -51,7 +51,7 @@ def format_docs(docs):
 def get_retriever(split_docs, embedding):
     db = Chroma.from_documents(documents=split_docs, embedding=embedding, persist_directory=CHROMA_DIR)
     retriever = db.as_retriever()
-    print(retriever.invoke("万清平是谁?"))
+    # print(retriever.invoke("万清平是谁?"))
     return retriever
 
 
@@ -70,8 +70,8 @@ def getChain(retriever):
                 | llm
                 | StrOutputParser()
                 )
-    question = "夸告矢找谁?"
-    print(my_chain.invoke({"question": question}))
+    # question = "夸告矢找谁?"
+    # print(my_chain.invoke({"question": question}))
     return my_chain
 
 
@@ -101,6 +101,7 @@ if __name__ == "__main__":
     split_docs = load_documents('using_files/data')
     for doc in split_docs:
         print(doc)
+    print(split_docs)
     end = time.time()
     print(f"数据切分时间：{(end - start) / 60 % 60:.4f}分({end - start:.4f}秒)")
-    retriever = get_retriever(split_docs, embedding)
+    # retriever = get_retriever(split_docs, embedding)

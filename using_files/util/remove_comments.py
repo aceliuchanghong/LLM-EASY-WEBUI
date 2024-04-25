@@ -4,6 +4,7 @@ import re
 def remove_comments(input_file):
     with open(input_file, 'r', encoding='utf-8') as f:
         lines = f.readlines()
+        ans = ''
 
         in_comment_block = False
         for line in lines:
@@ -30,8 +31,12 @@ def remove_comments(input_file):
             # 如果行还有内容，打印出来
             if line:
                 print(line)
+                ans += line + '\n'
+    return ans
 
 
 if __name__ == '__main__':
-    input_file = '../test/test_gradio.py'
-    remove_comments(input_file)
+    input_file = '../../main.py'
+    text = remove_comments(input_file)
+    with open('../ungit/00.py', 'w', encoding='utf-8') as f:
+        f.write(text)
