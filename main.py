@@ -57,12 +57,11 @@ def get_retriever(split_docs, embedding):
 
 def getChain(retriever):
     # 修改之后的prompt模板
-    prompt = PromptTemplate.from_template("""
-    根据文本回答问题:
+    prompt = PromptTemplate.from_template("""根据文本回答问题:
     {context}
     问题:
     {question}
-    找不到就请回答:"DK"
+    不清楚就回答:"DK"
     """)
     # chain
     my_chain = ({"context": retriever | format_docs, "question": RunnablePassthrough()}
@@ -104,3 +103,4 @@ if __name__ == "__main__":
     end = time.time()
     print(f"数据切分时间：{(end - start) / 60 % 60:.4f}分({end - start:.4f}秒)")
     retriever = get_retriever(split_docs, embedding)
+    chain = getChain(retriever)
