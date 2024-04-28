@@ -74,7 +74,8 @@ def create_app():
         )
         with gr.Row():
             chat_input = gr.MultimodalTextbox(scale=10, interactive=True, file_types=["image"],
-                                              placeholder="输入聊天信息或者上传文件...", show_label=False)
+                                              placeholder="输入聊天信息或者上传文件...", show_label=False,
+                                              )
             btn_clear_his = gr.Button(scale=2, value="清空聊天历史", variant="secondary")
 
             chat_msg = chat_input.submit(add_message, [chatbot, chat_input], [chatbot, chat_input])

@@ -36,7 +36,7 @@ def remove_comments(input_file):
 
 
 if __name__ == '__main__':
-    input_file = '../../main.py'
+    input_file = '../test/test_gradio.py'
     text = remove_comments(input_file)
     with open('../ungit/00.py', 'w', encoding='utf-8') as f:
         f.write(text)
