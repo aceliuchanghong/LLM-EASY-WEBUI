@@ -50,7 +50,7 @@ def format_docs(docs):
 def get_retriever(split_docs, embedding):
     db = Chroma.from_documents(documents=split_docs, embedding=embedding, persist_directory=CHROMA_DIR)
     retriever = db.as_retriever()
-    print(retriever.invoke("万清平是谁?"))
+    # print(retriever.invoke("万清平是谁?"))
     return retriever
 
 
@@ -68,8 +68,8 @@ def getChain(retriever):
                 | llm
                 | StrOutputParser()
                 )
-    question = "夸告矢找谁?"
-    print(my_chain.invoke({"question": question}))
+    # question = "夸告矢找谁?"
+    # print(my_chain.invoke({"question": question}))
     return my_chain
 
 
@@ -81,7 +81,7 @@ def create_chain_app():
                 elem_id="chatbot",
                 avatar_images=(None, (os.path.join(os.path.dirname(__file__), "../img", "avatar.jpg"))),
                 bubble_full_width=False,
-                height="700px",
+                height="600px",
             )
             with gr.Row():
                 chat_input = gr.MultimodalTextbox(scale=10, interactive=True, file_types=["image"],
