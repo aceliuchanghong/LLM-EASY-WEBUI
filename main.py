@@ -7,21 +7,20 @@ from langchain_community.vectorstores import Chroma
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
+from langchain_openai import ChatOpenAI
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 import config
-from using_files.test.test_llm import ChatCompletion
 import time
 
 # Load environment variables
 DEEPINFRA_API_KEY = os.getenv('DEEPINFRA_API_KEY')
 
 # Initialize the language model
-llm = ChatCompletion(
-    temperature=0.9,
-    model="meta-llama/Meta-Llama-3-70B-Instruct",
-    api_key=DEEPINFRA_API_KEY,
+llm = ChatOpenAI(
     base_url="https://api.deepinfra.com/v1/openai",
+    api_key=DEEPINFRA_API_KEY,
+    model="meta-llama/Meta-Llama-3-70B-Instruct"
 )
 
 embedding = DeepInfraEmbeddings(
