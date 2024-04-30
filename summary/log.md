@@ -40,3 +40,9 @@ Compute M：计算模式；
 |    0   N/A  N/A    256081      C   /usr/local/bin/python                      1788MiB |
 +---------------------------------------------------------------------------------------+
 ```
+
+conda环境创建使用
+```shell
+conda create -n mySummary python=3.11
+source activate mySummary
+```
