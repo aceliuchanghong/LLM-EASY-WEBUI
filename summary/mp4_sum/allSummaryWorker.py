@@ -5,7 +5,7 @@ from summary.util.text_from_mp3 import get_whisper_model, get_whisper_text
 
 
 class allSummaryWorker(Mp4SummaryWorker):
-    def summary(self, title=None, info=None, mode="normal"):
+    def summary(self, mode="normal", title=None, info=None):
         """
         视频文本标题,文本附加信息==>总体摘要
         :param mode: 文本生成的形式
@@ -21,9 +21,9 @@ class allSummaryWorker(Mp4SummaryWorker):
 
         all_info = text
         if title:
-            all_info += "视频标题:" + title
+            all_info += "\n视频标题:" + title
         if info:
-            all_info += "视频备注:" + info
+            all_info += "\n视频备注:" + info
 
         this_prompt = allSummaryPromptStart + all_info + allSummaryPromptEnd
         print("开始生成总体摘要:")
@@ -36,5 +36,5 @@ class allSummaryWorker(Mp4SummaryWorker):
 if __name__ == '__main__':
     mp4_path = r"C:\Users\lawrence\Videos\yunyin.mp4"
     allSum = allSummaryWorker(mp4_path)
-    ans = allSum.summary()
-    print(ans)
+    ans = allSum.summary(title="说剑", info="中国古文")
+    print("结果:" + ans)

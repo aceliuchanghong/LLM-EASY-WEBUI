@@ -15,8 +15,15 @@ summary/
 │   ├── core.py
 │   └── stepSummaryWorker.py
 ├── util/
-│   ├── model.py
+│   ├── create_llm.py
 │   └── text_from_mp3.py
 └── worker/
     └── Worker.py
+```
+
+测试文本
+
+```shell
+python .\smain.py --summaryType SumMp4All --filePath "C:\Users\lawrence\Videos\yunyin.mp4"
+python .\smain.py --summaryType SumMp4Step --filePath "C:\Users\lawrence\Videos\yunyin.mp4"
 ```

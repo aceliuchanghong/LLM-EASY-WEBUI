@@ -33,6 +33,12 @@ class MediaSummaryWorker(ABC):
             os.makedirs(output_dir)
         return path
 
+    def _is_exists(self):
+        if not os.path.exists(self.file_path):
+            print("File doesn't exist in :", self.file_path)
+            return False
+        return True
+
     def _get_file_info(self):
         file_name = os.path.basename(self.file_path)
         file_dir = os.path.dirname(self.file_path)
