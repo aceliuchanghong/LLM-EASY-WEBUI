@@ -7,6 +7,7 @@ watch -n 30 nvidia-smi
 # 查看服务器是64位还是32位
 getconf LONG_BIT
 ```
+
 ```text
 表头释义： 
 
@@ -42,7 +43,17 @@ Compute M：计算模式；
 ```
 
 conda环境创建使用
+
 ```shell
 conda create -n mySummary python=3.11
 source activate mySummary
+```
+
+环境变量设置
+
+```shell
+vim ~/.bashrc
+export OPENAI_API_KEY=sk-xx
+source ~/.bashrc
+echo $OPENAI_API_KEY
 ```
