@@ -3,8 +3,9 @@
 ```text
 summary/
 |
-├── log.md
+├── config.py
 ├── main.py
+├── readme.md
 ├── mp4_sum/
 │   ├── allSummaryWorker.py
 │   ├── core.py
@@ -13,6 +14,9 @@ summary/
 │   ├── allSummaryWorker.py
 │   ├── core.py
 │   └── stepSummaryWorker.py
+├── util/
+│   ├── model.py
+│   └── text_from_mp3.py
 └── worker/
     └── Worker.py
 ```
