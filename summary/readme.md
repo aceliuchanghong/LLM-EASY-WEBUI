@@ -13,6 +13,7 @@ summary/
 │   ├── allSummaryWorker.py
 │   └── core.py
 ├── util/
+│   ├── check_db.py
 │   ├── create_llm.py
 │   ├── mp3_from_mp4.py
 │   ├── text_from_file.py
@@ -33,5 +34,4 @@ python .\smain.py --summaryType SumTextAll --filePath "C:\Users\lawrence\Videos\
 TODO
 
 - 增加docx,doc,excel,pdf,txt文件总结
-- 增加数据库,免得重跑
 - 增加webui界面
