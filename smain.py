@@ -9,12 +9,13 @@ SummaryWorker = {
 
 
 def main(summaryType, filePath):
-    Summary = SummaryWorker.get(summaryType)(filePath)
     if summaryType not in SummaryWorker:
-        print(f"Unsupported platform: {summaryType}" + "\n仅支持:SumMp4All,SumMp4Step")
+        print(f"Unsupported summaryType: {summaryType}\n仅支持:SumMp4All,SumMp4Step")
         return
+    Summary = SummaryWorker.get(summaryType)(filePath)
     if not Summary._is_exists():
         print("视频不存在,退出程序")
+        return
     Summary.summary()
 
 

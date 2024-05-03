@@ -5,13 +5,13 @@ from summary.util.text_from_mp3 import get_whisper_model, get_whisper_text
 
 
 class allSummaryWorker(Mp4SummaryWorker):
-    def summary(self, mode="normal", title=None, info=None):
+    def summary(self, mode="normal", text=None, title=None, info=None):
         """
         视频文本标题,文本附加信息==>总体摘要
         :param mode: 文本生成的形式
+        :param text: 文本
         :param title: 文本标题
         :param info: 文本附加信息
-        :return: str: 总体摘要
         """
         mp3_file_path = self._get_mp3_from_mp4()
         whisperModel = get_whisper_model(model_size_or_path)
