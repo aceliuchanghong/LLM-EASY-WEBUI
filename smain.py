@@ -1,29 +1,49 @@
+import os
+from summary.config import model_size_or_path
 from summary.mp4_sum.allSummaryWorker import allSummaryWorker
 from summary.mp4_sum.stepSummaryWorker import stepSummaryWorker
 import argparse
+
+from summary.util.mp3_from_mp4 import get_mp3_from_mp4
+from summary.util.text_from_mp3 import get_whisper_model, get_whisper_text
 
 SummaryWorker = {
     "SumMp4Step": stepSummaryWorker,
     "SumMp4All": allSummaryWorker,
 }
+SummaryMode = {
+    "SumMp4Step": "timeline",
+    "SumMp4All": "normal",
+}
 
 
-def main(summaryType, filePath):
+def main(summaryType, filePath, fileInfo=None, whisperModel=None):
     if summaryType not in SummaryWorker:
         print(f"Unsupported summaryType: {summaryType}\n仅支持:SumMp4All,SumMp4Step")
         return
-    Summary = SummaryWorker.get(summaryType)(filePath)
-    if not Summary._is_exists():
-        print("视频不存在,退出程序")
+    if not os.path.exists(filePath):
+        print("File doesn't exist in:", filePath)
         return
-    Summary.summary()
+    if summaryType in ('SumMp4All', 'SumMp4Step'):
+        mp3FilePath = get_mp3_from_mp4(filePath)
+        text = get_whisper_text(whisperModel=whisperModel, audio_path=mp3FilePath, mode=SummaryMode.get(summaryType))
+    else:
+        text = None
+    print("待总结:" + text)
+    Summary = SummaryWorker.get(summaryType)(filePath)
+    file_name, file_dir = Summary._get_file_info()
+    sumText = Summary.summary(text=text, title=file_name, info=fileInfo)
+    print("结果:" + sumText)
+    return sumText
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Upload videos to various platforms.")
+    whisperModel = get_whisper_model(model_size_or_path)
 
+    parser = argparse.ArgumentParser(description="various summaryTypes")
     parser.add_argument('--summaryType', required=True, help="总结的类型:SumMp4All,SumMp4Step")
     parser.add_argument('--filePath', required=True, help="Path of the video file.")
+    parser.add_argument('--fileInfo', required=False, help="Path of the video file.")
     args = parser.parse_args()
 
-    main(args.summaryType, args.filePath)
+    main(args.summaryType, args.filePath, args.fileInfo, whisperModel)

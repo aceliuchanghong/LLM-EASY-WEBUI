@@ -7,3 +7,9 @@ allSummaryPromptEnd = """
 
 .第一遍一定不完美,请反复考虑斟酌一下,如果你做的够完美,我愿意支付$10小费!
 """
+stepSummaryPromptStart = """
+
+"""
+stepSummaryPromptEnd = """
+
+"""
