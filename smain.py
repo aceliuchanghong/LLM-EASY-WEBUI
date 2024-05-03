@@ -1,5 +1,10 @@
 import os
-from summary.config import model_size_or_path, table_select_sum_sql, table_del_url_sql, table_add_sql, create_table_sql
+from summary.config import (model_size_or_path,
+                            table_select_sum_sql,
+                            table_del_url_sql,
+                            table_add_sql,
+                            create_table_sql,
+                            table_select_text_sql)
 from summary.mp4_sum.allSummaryWorker import allSummaryWorker
 from summary.mp4_sum.stepSummaryWorker import stepSummaryWorker
 import argparse
@@ -29,9 +34,11 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
     if not reRun:
         if check(summaryType, filePath) != 0:
             print(f"The {summaryType}:{filePath} have already been summaried")
-            return excute_sqlite_sql(table_select_sum_sql(summaryType, filePath), False)
+            print("待总结:\n" + excute_sqlite_sql(table_select_text_sql, (summaryType, filePath), False)[0][0])
+            print("结果:\n" + excute_sqlite_sql(table_select_sum_sql, (summaryType, filePath), False)[0][0])
+            return excute_sqlite_sql(table_select_sum_sql, (summaryType, filePath), False)[0][0]
     if reRun:
-        excute_sqlite_sql(table_del_url_sql(summaryType, filePath), False)
+        excute_sqlite_sql(table_del_url_sql, (summaryType, filePath), False)
     if summaryType not in SummaryWorker:
         print(f"Unsupported summaryType: {summaryType}\n仅支持:SumMp4All,SumMp4Step,SumTextAll")
         return
@@ -49,7 +56,8 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
     sumText = Summary.summary(text=text, title=file_name, info=fileInfo)
     print("结果:\n" + sumText)
     excute_sqlite_sql(
-        table_add_sql(summaryType, filePath, text, fileInfo, sumText, str(datetime.now().strftime('%Y%m%d')), "remark"),
+        table_add_sql,
+        (summaryType, filePath, text, fileInfo, sumText, str(datetime.now().strftime('%Y%m%d')), "remark"),
         False)
     return sumText
 

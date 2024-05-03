@@ -36,6 +36,9 @@ select * from media_sum_info where summaryType = ? and filePath = ?
 table_select_sum_sql = """
 select sumText from media_sum_info where summaryType = ? and filePath = ?
 """
+table_select_text_sql = """
+select text_detail from media_sum_info where summaryType = ? and filePath = ?
+"""
 table_count_sql = """
 select count(*) from media_sum_info
 """
