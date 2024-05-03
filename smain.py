@@ -31,6 +31,7 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
     插入数据库信息:
     summaryType,filePath,text,fileInfo,sumText,time
     """
+    # 数据库校验
     if not reRun:
         if check(summaryType, filePath) != 0:
             print(f"The {summaryType}:{filePath} have already been summaried")
@@ -39,12 +40,15 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
             return excute_sqlite_sql(table_select_sum_sql, (summaryType, filePath), False)[0][0]
     if reRun:
         excute_sqlite_sql(table_del_url_sql, (summaryType, filePath), False)
+    # 参数校验
     if summaryType not in SummaryWorker:
         print(f"Unsupported summaryType: {summaryType}\n仅支持:SumMp4All,SumMp4Step,SumTextAll")
         return
     if not os.path.exists(filePath):
         print("File doesn't exist in:", filePath)
         return
+
+    # 开始执行
     if summaryType in ('SumMp4All', 'SumMp4Step'):
         mp3FilePath = get_mp3_from_mp4(filePath)
         text = get_whisper_text(whisperModel=whisperModel, audio_path=mp3FilePath, mode=SummaryMode.get(summaryType))
@@ -55,6 +59,8 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
     file_name, file_dir = Summary._get_file_info()
     sumText = Summary.summary(text=text, title=file_name, info=fileInfo)
     print("结果:\n" + sumText)
+
+    # 存储进入数据库
     excute_sqlite_sql(
         table_add_sql,
         (summaryType, filePath, text, fileInfo, sumText, str(datetime.now().strftime('%Y%m%d')), "remark"),
