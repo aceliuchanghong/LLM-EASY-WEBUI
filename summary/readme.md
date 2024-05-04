@@ -32,6 +32,20 @@ git clone https://github.com/aceliuchanghong/LLM-EASY-WEBUI.git
 source activate mySummary
 cd LLM-EASY-WEBUI
 pip install -r requirements.txt
+
+# 找个目录下载
+wget https://github.com/Purfview/whisper-standalone-win/releases/download/libs/cuBLAS.and.cuDNN_CUDA11_linux_v4.7z
+7za x cuBLAS.and.cuDNN_CUDA11_linux_v4.7z
+# 放置到虚拟环境的lib下面
+cp /home/liuchanghong/faster-whisper-large-v3/*.so.* $HOME/anaconda3/envs/mySummary/lib
+以下六个文件 libcublasLt.so.12,libcublasLt.so.11 && libcublasLt.so.11,libcublasLt.so.12其实一样的,只是名字我改了
+#-rw-rw-r--  1 liuchanghong liuchanghong 574565016 May  5 07:41 libcublasLt.so.12
+#-rw-rw-r--  1 liuchanghong liuchanghong  94729912 May  5 07:41 libcublas.so.12
+#-rw-rw-r--  1 liuchanghong liuchanghong 574565016 May  5 08:21 libcublasLt.so.11
+#-rw-rw-r--  1 liuchanghong liuchanghong  94729912 May  5 08:21 libcublas.so.11
+#-rw-rw-r--  1 liuchanghong liuchanghong 563283840 May  5 08:21 libcudnn_cnn_infer.so.8
+#-rw-rw-r--  1 liuchanghong liuchanghong  90849728 May  5 08:21 libcudnn_ops_infer.so.8
+
 ## 报错忽略
 ## ERROR: Could not find a version that satisfies the requirement pywin32==306 (from versions: none)
 ## ERROR: No matching distribution found for pywin32==306
