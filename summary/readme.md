@@ -57,6 +57,7 @@ python .\smain.py --summaryType SumMp4All --filePath "C:\Users\lawrence\Videos\w
 
 # 服务器测试语句
 # 测试视频 
+source activate mySummary
 wget http://flv4mp4.people.com.cn/videofile7/pvmsvideo/2024/4/30/RenMinShiPinBianJiZu-QinRong_4a7019afadf230e3364df531ec39dbed_android_c.mp4
 cd /home/liuchanghong/LLM-EASY-WEBUI
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言"
