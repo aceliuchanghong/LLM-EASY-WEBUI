@@ -52,6 +52,24 @@ def get_whisper_text(whisperModel, audio_path, mode="timeline"):
         return transcription
 
 
+def get_whisper_text_2(audio_path):
+    import httpx
+    from openai import OpenAI
+
+    proxyHost = "127.0.0.1"
+    proxyPort = 10809
+    client = OpenAI(http_client=httpx.Client(proxies=f"http://{proxyHost}:{proxyPort}"))
+
+    audio_file = open(audio_path, "rb")
+    transcription = client.audio.transcriptions.create(
+        model="whisper-1",
+        file=audio_file,
+        response_format='srt'
+    )
+    print(transcription.text)
+    return transcription.text
+
+
 if __name__ == '__main__':
     model_size_or_path = r'C:\Users\lawrence\Documents\large_v3'
     audio_path = r"C:\Users\lawrence\Videos\yunyin.mp4.mp3"
@@ -61,3 +79,4 @@ if __name__ == '__main__':
     whisperModel = get_whisper_model(model_size_or_path)
     text = get_whisper_text(whisperModel=whisperModel, audio_path=audio_path, mode=mode)
     print("\n\ntimeline:\n" + text)
+    print(get_whisper_text_2(audio_path))

@@ -27,17 +27,16 @@ summary/
 ```shell
 # 环境安装配置
 git clone https://github.com/aceliuchanghong/LLM-EASY-WEBUI.git
-# 配置好环境变量OPENAI_API_KEY,配置好需要的pthon虚拟环境(参见项目readme)
+# 配置好环境变量OPENAI_API_KEY,配置好需要的python虚拟环境(参见项目readme)
 # 我已经做好了,只需要激活就好了
 source activate mySummary
 cd LLM-EASY-WEBUI
 pip install -r requirements.txt
-""" 报错忽略
-ERROR: Could not find a version that satisfies the requirement pywin32==306 (from versions: none)
-ERROR: No matching distribution found for pywin32==306
-pip install langchain-openai
-pip install easy-media-utils
-"""
+## 报错忽略
+## ERROR: Could not find a version that satisfies the requirement pywin32==306 (from versions: none)
+## ERROR: No matching distribution found for pywin32==306
+## pip install langchain-openai
+## pip install easy-media-utils
 
 参数简短说明:
 # SumMp4All,SumTextAll==>总体总结 SumMp4Step==>章节总结  
