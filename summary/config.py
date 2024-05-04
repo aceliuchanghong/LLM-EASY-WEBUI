@@ -1,3 +1,6 @@
+llm_model_name = "gpt-4-turbo"
+openai_api_base = "https://api.xty.app/v1"
+
 model_size_or_path = r'C:\Users\lawrence\Documents\large_v3'
 allSummaryPromptStart = """
 我希望你是一名专业的视频内容编辑,帮我用中文总结内容精华.请用一句简短的话总结梗概,大概100-150字左右,内容如下:

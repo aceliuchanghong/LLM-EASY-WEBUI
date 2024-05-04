@@ -36,9 +36,9 @@ pip install -r requirements.txt
 # 找个目录下载
 wget https://github.com/Purfview/whisper-standalone-win/releases/download/libs/cuBLAS.and.cuDNN_CUDA11_linux_v4.7z
 7za x cuBLAS.and.cuDNN_CUDA11_linux_v4.7z
-# 放置到虚拟环境的lib下面
+# 把 *.so.* 放置到虚拟环境的lib下面,或者其他path都可以
 cp /home/liuchanghong/faster-whisper-large-v3/*.so.* $HOME/anaconda3/envs/mySummary/lib
-以下六个文件 libcublasLt.so.12,libcublasLt.so.11 && libcublasLt.so.11,libcublasLt.so.12其实一样的,只是名字我改了
+# 以下六个文件 libcublasLt.so.12,libcublasLt.so.11 && libcublasLt.so.11,libcublasLt.so.12其实一样的,只是名字我改了
 #-rw-rw-r--  1 liuchanghong liuchanghong 574565016 May  5 07:41 libcublasLt.so.12
 #-rw-rw-r--  1 liuchanghong liuchanghong  94729912 May  5 07:41 libcublas.so.12
 #-rw-rw-r--  1 liuchanghong liuchanghong 574565016 May  5 08:21 libcublasLt.so.11
@@ -49,12 +49,15 @@ cp /home/liuchanghong/faster-whisper-large-v3/*.so.* $HOME/anaconda3/envs/mySumm
 ## 报错忽略
 ## ERROR: Could not find a version that satisfies the requirement pywin32==306 (from versions: none)
 ## ERROR: No matching distribution found for pywin32==306
+## 执行时候报错缺少模块,就安装就好了
 ## pip install langchain-openai
 ## pip install easy-media-utils
+## pip install moviepy
 
 参数简短说明:
 # SumMp4All,SumTextAll==>总体总结 SumMp4Step==>章节总结  
-# summary/config.py里面有一个音频模型文件需要下载好,修改model_size_or_path的路径(/home/liuchanghong/faster-whisper-large-v3)
+# summary/config.py里面有一个音频模型文件需要提前下载好,修改model_size_or_path的路径(/home/liuchanghong/faster-whisper-large-v3)
+# 如果使用的官方key,summary/config.py里面openai_api_base记得改下(模型也可以改一下) 
 # 重跑的话增加 --reRun
 ```
 
@@ -71,10 +74,12 @@ python .\smain.py --summaryType SumMp4All --filePath "C:\Users\lawrence\Videos\w
 # 服务器测试语句
 # 测试视频 
 source activate mySummary
-wget http://flv4mp4.people.com.cn/videofile7/pvmsvideo/2024/4/30/RenMinShiPinBianJiZu-QinRong_4a7019afadf230e3364df531ec39dbed_android_c.mp4
+# 我测试下载的视频 视频名字最好有正确含义
+# wget http://flv4mp4.people.com.cn/videofile7/pvmsvideo/2024/4/30/RenMinShiPinBianJiZu-QinRong_4a7019afadf230e3364df531ec39dbed_android_c.mp4
 cd /home/liuchanghong/LLM-EASY-WEBUI
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言"
 python smain.py --summaryType SumMp4All --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言"
+python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言" --reRun
 ```
 
 TODO
