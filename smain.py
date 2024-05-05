@@ -37,16 +37,17 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
             print(f"The {summaryType}:{filePath} have already been summaried")
             print("待总结:\n" + excute_sqlite_sql(table_select_text_sql, (summaryType, filePath), False)[0][0])
             print("结果:\n" + excute_sqlite_sql(table_select_sum_sql, (summaryType, filePath), False)[0][0])
-            return excute_sqlite_sql(table_select_sum_sql, (summaryType, filePath), False)[0][0]
+            return excute_sqlite_sql(table_select_text_sql, (summaryType, filePath), False)[0][0], \
+                excute_sqlite_sql(table_select_sum_sql, (summaryType, filePath), False)[0][0]
     if reRun:
         excute_sqlite_sql(table_del_url_sql, (summaryType, filePath), False)
     # 参数校验
     if summaryType not in SummaryWorker:
         print(f"Unsupported summaryType: {summaryType}\n仅支持:SumMp4All,SumMp4Step,SumTextAll")
-        return
+        return "总结方法有误", "总结失败"
     if not os.path.exists(filePath):
         print("File doesn't exist in:", filePath)
-        return
+        return filePath + "文件不存在", "总结失败"
 
     # 开始执行
     if summaryType in ('SumMp4All', 'SumMp4Step'):
