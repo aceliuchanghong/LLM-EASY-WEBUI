@@ -1,6 +1,8 @@
 import gradio as gr
 import os
 from datetime import datetime
+
+from smain import main
 from summary.text_sum.allSummaryWorker import allTextSummaryWorker
 from summary.util.check_db import check, excute_sqlite_sql
 from summary.util.mp3_from_mp4 import get_mp3_from_mp4
@@ -41,7 +43,9 @@ def doItTest(summary_type, file_Path, file_get_type='upload', file_Info=None, re
     fileInfo = file_Info
     reRun = reRunType[re_run]
     print(summaryType, fileInfo, reRun)
-    return "00", "11"
+    whisperModel = get_whisper_model(model_size_or_path)
+
+    return main(summaryType, file_Path, fileInfo, whisperModel, reRun)
 
 
 # C:\Users\lawrence\AppData\Local\Temp\gradio
@@ -71,7 +75,7 @@ def create_chain_app():
             with gr.Row():
                 media_select_block = gr.Dropdown(label='或者选择媒体文件',
                                                  choices=[''] + [f for f in os.listdir(file_default_path)
-                                                                 if f.endswith(('.mp4', '.mp3'))], scale=6)
+                                                                 if f.endswith('.mp4')], scale=6)
             with gr.Row():
                 input_textbox = gr.Textbox(label='媒体文件描述', scale=10)
                 input_type = gr.Dropdown(label='生成摘要类型', choices=['总体摘要', '章节摘要'], value='章节摘要',
