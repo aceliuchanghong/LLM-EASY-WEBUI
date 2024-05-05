@@ -53,11 +53,12 @@ cp /home/liuchanghong/faster-whisper-large-v3/*.so.* $HOME/anaconda3/envs/mySumm
 ## pip install langchain-openai
 ## pip install easy-media-utils
 ## pip install moviepy
+## pip install gradio
 
 参数简短说明:
 # SumMp4All,SumTextAll==>总体总结 SumMp4Step==>章节总结  
 # summary/config.py里面有一个音频模型文件需要提前下载好,修改model_size_or_path的路径(/home/liuchanghong/faster-whisper-large-v3)
-# file_default_path这个是指自己传的文件路径,记得改
+# file_default_path这个是指自己传的文件路径,记得改 (/home/liuchanghong/media_files)
 # 如果使用的官方key,summary/config.py里面openai_api_base记得改下(模型也可以改一下) 
 # 重跑的话增加 --reRun
 ```
@@ -81,9 +82,16 @@ cd /home/liuchanghong/LLM-EASY-WEBUI
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言"
 python smain.py --summaryType SumMp4All --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言"
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言" --reRun
+python sUI.py 
+python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化整体.mp4" --fileInfo "企业文化宣讲"
+python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化讲解1.mp4" --fileInfo "企业文化宣讲"
+python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解1.mp4" --fileInfo "企业文化宣讲"
+python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解2.mp4" --fileInfo "企业文化宣讲"
+python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解3.mp4" --fileInfo "企业文化宣讲"
+python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解4.mp4" --fileInfo "企业文化宣讲"
+python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解5.mp4" --fileInfo "企业文化宣讲"
 ```
 
 TODO
 
 - 增加docx,doc,excel,pdf,txt文件总结
-- 增加webui界面
