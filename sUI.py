@@ -1,20 +1,9 @@
 import gradio as gr
 import os
-from datetime import datetime
-
 from smain import main
-from summary.text_sum.allSummaryWorker import allTextSummaryWorker
-from summary.util.check_db import check, excute_sqlite_sql
-from summary.util.mp3_from_mp4 import get_mp3_from_mp4
-from summary.util.text_from_mp3 import get_whisper_model, get_whisper_text
+from summary.util.text_from_mp3 import get_whisper_model
 from summary.config import (model_size_or_path,
-                            table_select_sum_sql,
-                            table_del_url_sql,
-                            table_add_sql,
-                            create_table_sql,
-                            table_select_text_sql,
                             file_default_path)
-from summary.util.create_llm import get_llm
 
 SummaryType = {
     "总体摘要": "SumMp4All",
@@ -25,10 +14,6 @@ reRunType = {
     "是": True,
     "否": False,
 }
-
-
-def doIt(whisper_model):
-    pass
 
 
 def doItTest(summary_type, file_Path, file_get_type='upload', file_Info=None, re_run=False):
@@ -103,4 +88,4 @@ if __name__ == '__main__':
     #
     # app = create_chain_app(whisper_model)
     app = create_chain_app()
-    app.launch(server_name="0.0.0.0", server_port=2333, share=False)
+    app.launch(server_name="0.0.0.0", server_port=2333, share=True)

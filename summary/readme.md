@@ -57,6 +57,7 @@ cp /home/liuchanghong/faster-whisper-large-v3/*.so.* $HOME/anaconda3/envs/mySumm
 参数简短说明:
 # SumMp4All,SumTextAll==>总体总结 SumMp4Step==>章节总结  
 # summary/config.py里面有一个音频模型文件需要提前下载好,修改model_size_or_path的路径(/home/liuchanghong/faster-whisper-large-v3)
+# file_default_path这个是指自己传的文件路径,记得改
 # 如果使用的官方key,summary/config.py里面openai_api_base记得改下(模型也可以改一下) 
 # 重跑的话增加 --reRun
 ```
