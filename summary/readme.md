@@ -82,16 +82,21 @@ cd /home/liuchanghong/LLM-EASY-WEBUI
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言"
 python smain.py --summaryType SumMp4All --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言"
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言" --reRun
-python sUI.py 
-python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化整体.mp4" --fileInfo "企业文化宣讲"
-python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化讲解1.mp4" --fileInfo "企业文化宣讲"
-python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解1.mp4" --fileInfo "企业文化宣讲"
-python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解2.mp4" --fileInfo "企业文化宣讲"
-python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解3.mp4" --fileInfo "企业文化宣讲"
-python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解4.mp4" --fileInfo "企业文化宣讲"
-python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解5.mp4" --fileInfo "企业文化宣讲"
+# UI界面,不要传大视频,真的会卡掉的,掉了需要重拉
+python sUI.py
+# 建议测试这2个
+python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化讲解1.mp4" --fileInfo "格莱美企业文化宣讲"
+python smain.py --summaryType SumMp4All --filePath "/home/liuchanghong/media_files/企业文化讲解1.mp4" --fileInfo "格莱美企业文化宣讲"
+# 这几个更是重量级,一个比一个大,可以输出文本,但是超过openai的key限制了
+python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化整体.mp4" --fileInfo "格莱美企业文化宣讲"
+python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解1.mp4" --fileInfo "格莱美企业文化宣讲"
+python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解2.mp4" --fileInfo "格莱美企业文化宣讲"
+python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解3.mp4" --fileInfo "格莱美企业文化宣讲"
+python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解4.mp4" --fileInfo "格莱美企业文化宣讲"
+python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解5.mp4" --fileInfo "格莱美企业文化宣讲"
 ```
 
 TODO
 
 - 增加docx,doc,excel,pdf,txt文件总结
+
