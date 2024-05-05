@@ -21,35 +21,52 @@ SummaryType = {
     "章节摘要": "SumMp4Step",
 }
 
+reRunType = {
+    "是": True,
+    "否": False,
+}
 
-def doIt(llm, whisper_model):
+
+def doIt(whisper_model):
     pass
 
 
-def doItTest():
-    pass
+def doItTest(summary_type, file_Path, file_Info=None, re_run=False):
+    if file_Path.endswith('.mp3'):
+        print('mp3', file_Path)
+    else:
+        print('mp4', file_Path)
+
+    summaryType = SummaryType[summary_type]
+    fileInfo = file_Info
+    reRun = reRunType[re_run]
+    print(summaryType, fileInfo, reRun)
+    return "00", "11"
 
 
 def create_chain_app():
     """
-    llm, whisper_model
+    whisper_model
     :return:
     """
     with gr.Blocks() as demo:
         with gr.Tab(label='Transcribe Tab'):
             with gr.Row():
+                # C:\Users\lawrence\AppData\Local\Temp\gradio
                 media_upload_block = gr.File(file_count='single', file_types=['audio', 'video'],
                                              label='上传媒体文件')
                 media_select_block = gr.Dropdown(label='或者选择媒体文件',
                                                  choices=[''] + [f for f in os.listdir(file_default_path2)
                                                                  if f.endswith(('.mp4', '.mp3'))])
             with gr.Row():
-                input_textbox = gr.Textbox(label='该媒体文件描述', scale=10)
-                input_type = gr.Dropdown(label='生成类型', choices=['总体摘要', '章节摘要'], scale=2)
-                submit_button = gr.Button(value='生成', variant='primary', scale=4)
+                input_textbox = gr.Textbox(label='媒体文件描述', scale=10)
+                input_type = gr.Dropdown(label='生成摘要类型', choices=['总体摘要', '章节摘要'], value='章节摘要',
+                                         scale=2)
+                rerun_type = gr.Dropdown(label='是否重跑', choices=['否', '是'], value='否', scale=1)
+                submit_button = gr.Button(value='Generate', variant='primary', scale=4)
 
             with gr.Row():
-                output_textbox1 = gr.Textbox(lines=10, label='语音文本', scale=4)
+                output_textbox1 = gr.Textbox(lines=10, label='媒体文本', scale=4)
                 output_textbox2 = gr.Textbox(lines=10, label='摘要文本', scale=6)
 
             # Add visibility changing functions
@@ -66,22 +83,20 @@ def create_chain_app():
             media_select_block.change(fn=toggle_select_visibility, inputs=media_select_block,
                                       outputs=media_upload_block)
 
-            submit_button.click(fn=lambda x: x, inputs=[media_upload_block, media_select_block],
-                                outputs=[output_textbox1])
-            submit_button.click(fn=lambda x: x, inputs=[media_upload_block, media_select_block],
-                                outputs=[output_textbox2])
+            submit_button.click(fn=doItTest,
+                                inputs=[input_type, media_upload_block, input_textbox, rerun_type],
+                                outputs=[output_textbox1, output_textbox2])
 
         with gr.Tab(label='Structure Tab'):
-            img = gr.Image('using_files/img/img.png')
+            img = gr.Image(value='using_files/img/img.png', label='项目结构')
 
     return demo
 
 
 if __name__ == '__main__':
-    # llm = get_llm()
     # whisper_model = get_whisper_model(model_size_or_path)
     # excute_sqlite_sql(create_table_sql)
     #
-    # app = create_chain_app(llm, whisper_model)
+    # app = create_chain_app(whisper_model)
     app = create_chain_app()
     app.launch(server_name="0.0.0.0", server_port=2333, share=False)

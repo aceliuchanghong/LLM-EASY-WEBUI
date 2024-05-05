@@ -65,7 +65,7 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
         table_add_sql,
         (summaryType, filePath, text, fileInfo, sumText, str(datetime.now().strftime('%Y%m%d')), "remark"),
         False)
-    return sumText
+    return text, sumText
 
 
 if __name__ == "__main__":
