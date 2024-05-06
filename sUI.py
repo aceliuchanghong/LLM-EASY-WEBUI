@@ -58,7 +58,7 @@ def create_chain_app():
 
         with gr.Tab(label='选择转录'):
             with gr.Row():
-                media_select_block = gr.Dropdown(label='或者选择媒体文件',
+                media_select_block = gr.Dropdown(label='选择媒体文件',
                                                  choices=[''] + [f for f in os.listdir(file_default_path)
                                                                  if f.endswith('.mp4')], scale=6)
             with gr.Row():

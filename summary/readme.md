@@ -29,7 +29,7 @@ summary/
 git clone https://github.com/aceliuchanghong/LLM-EASY-WEBUI.git
 # 配置好环境变量OPENAI_API_KEY,配置好需要的python虚拟环境(参见项目readme)
 # 我已经做好了,只需要激活就好了
-source activate mySummary
+source activate myLLM_WEBUI
 cd LLM-EASY-WEBUI
 pip install -r requirements.txt
 
@@ -75,14 +75,14 @@ python .\smain.py --summaryType SumMp4All --filePath "C:\Users\lawrence\Videos\w
 
 # 服务器测试语句
 # 测试视频 
-source activate mySummary
+source activate myLLM_WEBUI
 # 我测试下载的视频 视频名字最好有正确含义
 # wget http://flv4mp4.people.com.cn/videofile7/pvmsvideo/2024/4/30/RenMinShiPinBianJiZu-QinRong_4a7019afadf230e3364df531ec39dbed_android_c.mp4
 cd /home/liuchanghong/LLM-EASY-WEBUI
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言"
 python smain.py --summaryType SumMp4All --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言"
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言" --reRun
-# UI界面,不要传大视频,真的会卡掉的,掉了需要重拉
+# UI界面,不要传大视频,真的会卡掉的,掉了需要重拉,记得开端口
 python sUI.py
 # 建议测试这2个
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化讲解1.mp4" --fileInfo "格莱美企业文化宣讲"
