@@ -78,28 +78,43 @@ def create_chain_app():
         with gr.Tab(label='Chat Tab'):
             chatbot = gr.Chatbot(
                 [],
-                elem_id="chatbot",
+                label="chatBot",
+                elem_id="chatBot",
                 avatar_images=(None, (os.path.join(os.path.dirname(__file__), "../img", "avatar.jpg"))),
                 bubble_full_width=False,
                 height="600px",
             )
             with gr.Row():
-                chat_input = gr.MultimodalTextbox(scale=10, interactive=True, file_types=["image"],
-                                                  placeholder="输入聊天信息或者上传文件...", show_label=False)
-        with gr.Tab(label='Secret Tab'):
+                chat_input = gr.Textbox(scale=10, interactive=True, lines=5, show_label=False,
+                                        placeholder="愿起一剑杀万劫...")
+                submit_button = gr.Button(value='Chat', variant='primary', scale=4)
+                clear_button = gr.Button(scale=2, value="Clear", variant="secondary")
+        with gr.Tab(label='File-Chat Tab'):
+            filechatbot = gr.Chatbot(
+                [],
+                label="fileChatBot",
+                elem_id="fileChatBot",
+                avatar_images=(None, (os.path.join(os.path.dirname(__file__), "../img", "avatar.jpg"))),
+                bubble_full_width=False,
+                height="600px",
+            )
+            with gr.Row():
+                file_chat_input = gr.MultimodalTextbox(scale=10, interactive=True, file_types=["text"],
+                                                       placeholder="上传文件开始聊天吧....", show_label=False)
+        with gr.Tab(label='Structure Tab'):
             img = gr.Image('using_files/img/img.png')
 
     return demo
 
 
 if __name__ == "__main__":
-    # app = create_chain_app()
-    # app.launch(server_name="0.0.0.0", server_port=2333, share=False)
-    start = time.time()
-    split_docs = load_documents('using_files/data')
-    for doc in split_docs:
-        print(doc)
-    end = time.time()
-    print(f"数据切分时间：{(end - start) / 60 % 60:.4f}分({end - start:.4f}秒)")
-    retriever = get_retriever(split_docs, embedding)
-    chain = getChain(retriever)
+    app = create_chain_app()
+    app.launch(server_name="0.0.0.0", server_port=2333, share=False)
+    # start = time.time()
+    # split_docs = load_documents('using_files/data')
+    # for doc in split_docs:
+    #     print(doc)
+    # end = time.time()
+    # print(f"数据切分时间：{(end - start) / 60 % 60:.4f}分({end - start:.4f}秒)")
+    # retriever = get_retriever(split_docs, embedding)
+    # chain = getChain(retriever)
