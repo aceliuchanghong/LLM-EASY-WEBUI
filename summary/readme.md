@@ -84,6 +84,8 @@ python smain.py --summaryType SumMp4All --filePath "/home/liuchanghong/LLM-EASY-
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言" --reRun
 # UI界面,不要传大视频,真的会卡掉的,掉了需要重拉,记得开端口
 python sUI.py
+# 或者
+uvicorn ui:app --port 9898
 # 建议测试这2个
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化讲解1.mp4" --fileInfo "格莱美企业文化宣讲"
 python smain.py --summaryType SumMp4All --filePath "/home/liuchanghong/media_files/企业文化讲解1.mp4" --fileInfo "格莱美企业文化宣讲"
