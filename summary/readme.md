@@ -22,6 +22,10 @@ summary/
     └── Worker.py
 ```
 
+```text
+腾讯会议总结模板
+录制文件：https://meeting.tencent.com/v2/cloud-record/share?id=1e08928b-a218-4091-8615-1d7fe5545020&from=3&record_type=2
+```
 测试执行语句,真正执行的时候做一个循环执行
 
 ```shell

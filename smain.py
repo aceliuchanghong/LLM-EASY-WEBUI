@@ -58,7 +58,8 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
     print("待总结:\n" + text)
     Summary = SummaryWorker.get(summaryType)(filePath)
     file_name, file_dir = Summary._get_file_info()
-    sumText = Summary.summary(text=text, title=file_name, info=fileInfo)
+    text_go_sum = text[:4000]
+    sumText = Summary.summary(text=text_go_sum, title=file_name, info=fileInfo)
     print("结果:\n" + sumText)
 
     # 存储进入数据库
