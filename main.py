@@ -75,7 +75,7 @@ def getChain(retriever):
 
 def create_chain_app():
     with gr.Blocks() as demo:
-        with gr.Tab(label='Chat Tab'):
+        with gr.Tab(label='Chat-Tab'):
             chatbot = gr.Chatbot(
                 [],
                 label="chatBot",
@@ -89,7 +89,7 @@ def create_chain_app():
                                         placeholder="愿起一剑杀万劫...")
                 submit_button = gr.Button(value='Chat', variant='primary', scale=4)
                 clear_button = gr.Button(scale=2, value="Clear", variant="secondary")
-        with gr.Tab(label='File-Chat Tab'):
+        with gr.Tab(label='File-Chat-Tab'):
             filechatbot = gr.Chatbot(
                 [],
                 label="fileChatBot",
@@ -101,7 +101,7 @@ def create_chain_app():
             with gr.Row():
                 file_chat_input = gr.MultimodalTextbox(scale=10, interactive=True, file_types=["text"],
                                                        placeholder="上传文件开始聊天吧....", show_label=False)
-        with gr.Tab(label='Structure Tab'):
+        with gr.Tab(label='Structure-Tab'):
             img = gr.Image('using_files/img/img.png')
 
     return demo

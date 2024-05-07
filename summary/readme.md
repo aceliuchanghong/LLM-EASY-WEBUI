@@ -26,7 +26,6 @@ summary/
 腾讯会议总结模板
 录制文件：https://meeting.tencent.com/v2/cloud-record/share?id=1e08928b-a218-4091-8615-1d7fe5545020&from=3&record_type=2
 ```
-测试执行语句,真正执行的时候做一个循环执行
 
 ```shell
 # 环境安装配置
@@ -40,7 +39,7 @@ pip install -r requirements.txt
 # 找个目录下载
 wget https://github.com/Purfview/whisper-standalone-win/releases/download/libs/cuBLAS.and.cuDNN_CUDA11_linux_v4.7z
 7za x cuBLAS.and.cuDNN_CUDA11_linux_v4.7z
-# 把 *.so.* 放置到虚拟环境的lib下面,或者其他path都可以
+# 把 上面解压获得的 *.so.* 放置到虚拟环境的lib下面,或者其他path都可以
 cp /home/liuchanghong/faster-whisper-large-v3/*.so.* $HOME/anaconda3/envs/mySummary/lib
 # 以下六个文件 libcublasLt.so.12,libcublasLt.so.11 && libcublasLt.so.11,libcublasLt.so.12其实一样的,只是名字我改了
 #-rw-rw-r--  1 liuchanghong liuchanghong 574565016 May  5 07:41 libcublasLt.so.12
@@ -60,14 +59,15 @@ cp /home/liuchanghong/faster-whisper-large-v3/*.so.* $HOME/anaconda3/envs/mySumm
 ## pip install gradio
 
 参数简短说明:
-# SumMp4All,SumTextAll==>总体总结 SumMp4Step==>章节总结  
+# summaryType:SumMp4All,SumTextAll==>总体总结 SumMp4Step==>章节总结  
+# fileInfo==>视频说明,不是关键字
 # summary/config.py里面有一个音频模型文件需要提前下载好,修改model_size_or_path的路径(/home/liuchanghong/faster-whisper-large-v3)
-# file_default_path这个是指自己传的文件路径,记得改 (/home/liuchanghong/media_files)
+# summary/config.py里面file_default_path这个是指自己传的文件路径,记得改 (/home/liuchanghong/media_files)
 # 如果使用的官方key,summary/config.py里面openai_api_base记得改下(模型也可以改一下) 
 # 重跑的话增加 --reRun
 ```
 
-测试语句
+测试执行语句,真正执行的时候做一个循环执行
 
 ```shell
 # 本机测试语句
@@ -78,22 +78,22 @@ python .\smain.py --summaryType SumMp4Step --filePath "C:\Users\lawrence\Videos\
 python .\smain.py --summaryType SumMp4All --filePath "C:\Users\lawrence\Videos\waijiaobu.mp4" --fileInfo "中国外交部发言"
 
 # 服务器测试语句
-# 测试视频 
+# 测试视频 (由于myLLM_WEBUI放在了liuchanghong用户下,最好切换一下用户,或者自己的虚拟环境)
 source activate myLLM_WEBUI
-# 我测试下载的视频 视频名字最好有正确含义
+# 我测试下载的视频,改了一个名字==>waijiaobu 视频名字需要有正确含义
 # wget http://flv4mp4.people.com.cn/videofile7/pvmsvideo/2024/4/30/RenMinShiPinBianJiZu-QinRong_4a7019afadf230e3364df531ec39dbed_android_c.mp4
 cd /home/liuchanghong/LLM-EASY-WEBUI
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言"
 python smain.py --summaryType SumMp4All --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言"
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言" --reRun
 # UI界面,不要传大视频,真的会卡掉的,掉了需要重拉,记得开端口
-python sUI.py
+nohup uvicorn ui:app --port 9898 > unicore.log &
 # 或者
-uvicorn ui:app --port 9898
-# 建议测试这2个
+python sUI.py
+# 建议测试这2个,我只跑了这2个
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化讲解1.mp4" --fileInfo "格莱美企业文化宣讲"
 python smain.py --summaryType SumMp4All --filePath "/home/liuchanghong/media_files/企业文化讲解1.mp4" --fileInfo "格莱美企业文化宣讲"
-# 这几个更是重量级,一个比一个大,可以输出文本,但是超过openai的key限制了
+# 这几个更是重量级,一个比一个大,可以输出文本,但是我们使用的openai的key限制4096了,所以做了文本长度限制,可能总结不全
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化整体.mp4" --fileInfo "格莱美企业文化宣讲"
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解1.mp4" --fileInfo "格莱美企业文化宣讲"
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化课程讲解2.mp4" --fileInfo "格莱美企业文化宣讲"
