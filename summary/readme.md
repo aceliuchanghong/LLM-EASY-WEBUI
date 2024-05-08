@@ -61,16 +61,17 @@ cp /home/liuchanghong/faster-whisper-large-v3/*.so.* $HOME/anaconda3/envs/mySumm
 参数简短说明:
 # summaryType:SumMp4All,SumTextAll==>总体总结 SumMp4Step==>章节总结  
 # fileInfo==>视频说明,不是关键字
-# summary/config.py里面有一个音频模型文件需要提前下载好,修改model_size_or_path的路径(/home/liuchanghong/faster-whisper-large-v3)
-# summary/config.py里面file_default_path这个是指自己传的文件路径,记得改 (/home/liuchanghong/media_files)
-# 如果使用的官方key,summary/config.py里面openai_api_base记得改下(模型也可以改一下) 
-# 重跑的话增加 --reRun
+# 针对summary/config.py:
+# 有一个音频模型文件需要提前下载好,修改model_size_or_path的路径(/home/liuchanghong/faster-whisper-large-v3)
+# file_default_path这个是指自己传的文件路径,记得改 (/home/liuchanghong/media_files)
+# 如果使用的官方key,里面openai_api_base记得改下(模型也可以改一下) 
+# 可以修改 db_path = "/home/liuchanghong/media_files/media_sum.db"
 ```
 
 测试执行语句,真正执行的时候做一个循环执行
 
 ```shell
-# 本机测试语句
+# 本机测试语句 重跑的话增加 --reRun
 python .\smain.py --summaryType SumMp4All --filePath "C:\Users\lawrence\Videos\yunyin.mp4" --fileInfo "说剑"
 python .\smain.py --summaryType SumMp4Step --filePath "C:\Users\lawrence\Videos\yunyin.mp4" --fileInfo "说剑"
 python .\smain.py --summaryType SumTextAll --filePath "C:\Users\lawrence\Videos\XX.pdf" --fileInfo "说剑"

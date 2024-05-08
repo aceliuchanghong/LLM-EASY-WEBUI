@@ -1,9 +1,10 @@
 import gradio as gr
 from smain import main
+from summary.util.check_db import excute_sqlite_sql
 from summary.util.mp3_from_mp4 import get_media_files
 from summary.util.text_from_mp3 import get_whisper_model
 from summary.config import (model_size_or_path,
-                            file_default_path, company_name)
+                            file_default_path, company_name, create_table_sql)
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -67,8 +68,14 @@ def create_chain_app():
                 media_files = get_media_files(file_default_path)
                 media_select_block = gr.Dropdown(label='选择媒体文件',
                                                  choices=media_files, scale=6)
-                video_component = gr.Video(label='视频预览', scale=3)
-                audio_component = gr.Audio(label='音频预览', scale=3)
+                video_preview = gr.Video(label='视频预览', scale=3)
+                audio_preview = gr.Audio(label='音频预览', scale=3)
+
+                # Add a preview button to play the selected media file
+                preview_button = gr.Button(value='预览', variant='secondary', scale=2)
+                preview_button.click(fn=lambda x: (f'{file_default_path}/{x}', f'{file_default_path}/{x}'),
+                                     inputs=[media_select_block],
+                                     outputs=[video_preview, audio_preview])
 
             with gr.Row():
                 input_textbox = gr.Textbox(label='媒体关键字', scale=10)
@@ -87,12 +94,10 @@ def create_chain_app():
                                         rerun_type],
                                 outputs=[output_textbox1, output_textbox2])
 
-            media_select_block.change(fn=lambda x: x, inputs=[media_select_block], outputs=[video_component])
-            media_select_block.change(fn=lambda x: x, inputs=[media_select_block], outputs=[audio_component])
-
     return demo
 
 
 io = create_chain_app()
 CUSTOM_PATH = "/" + company_name
+excute_sqlite_sql(create_table_sql)
 app = gr.mount_gradio_app(app, io, path=CUSTOM_PATH)
