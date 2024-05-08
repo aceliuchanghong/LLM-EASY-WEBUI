@@ -1,6 +1,6 @@
 import gradio as gr
-import os
 from smain import main
+from summary.util.mp3_from_mp4 import get_media_files
 from summary.util.text_from_mp3 import get_whisper_model
 from summary.config import (model_size_or_path,
                             file_default_path, company_name)
@@ -21,10 +21,6 @@ reRunType = {
 def doIt(summary_type, file_Path, file_get_type='upload', file_Info=None, re_run=False):
     if file_get_type == 'choose':
         file_Path = file_default_path + "/" + file_Path
-    if file_Path.endswith('.mp3'):
-        print('mp3', file_Path)
-    else:
-        print('mp4', file_Path)
 
     summaryType = SummaryType[summary_type]
     fileInfo = file_Info
@@ -63,9 +59,7 @@ def create_chain_app():
 
         with gr.Tab(label='选择转录'):
             with gr.Row():
-                media_files = [''] + [os.path.relpath(os.path.join(root, f), file_default_path) for root, dirs, files in
-                                      os.walk(file_default_path)
-                                      for f in files if f.endswith('.mp4') or f.endswith('.mp3')]
+                media_files = get_media_files(file_default_path)
                 media_select_block = gr.Dropdown(label='选择媒体文件',
                                                  choices=media_files, scale=6)
             with gr.Row():

@@ -11,7 +11,7 @@ import argparse
 from datetime import datetime
 from summary.text_sum.allSummaryWorker import allTextSummaryWorker
 from summary.util.check_db import check, excute_sqlite_sql
-from summary.util.mp3_from_mp4 import get_mp3_from_mp4
+from summary.util.mp3_from_mp4 import get_mp3_from_mp4, is_audio_file
 from summary.util.text_from_mp3 import get_whisper_model, get_whisper_text
 
 SummaryWorker = {
@@ -51,7 +51,11 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
 
     # 开始执行
     if summaryType in ('SumMp4All', 'SumMp4Step'):
-        mp3FilePath = get_mp3_from_mp4(filePath)
+        # print(is_audio_file(filePath))
+        if is_audio_file(filePath):
+            mp3FilePath = filePath
+        else:
+            mp3FilePath = get_mp3_from_mp4(filePath)
         text = get_whisper_text(whisperModel=whisperModel, audio_path=mp3FilePath, mode=SummaryMode.get(summaryType))
     else:
         text = None
