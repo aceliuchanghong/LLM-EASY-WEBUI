@@ -21,7 +21,7 @@ SummaryWorker = {
 }
 SummaryMode = {
     "SumMp4Step": "timeline",
-    "SumMp4All": "normal",
+    "SumMp4All": "timeline",
     "SumTextAll": "normal",
 }
 
@@ -58,6 +58,8 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
     print("待总结:\n" + text)
     Summary = SummaryWorker.get(summaryType)(filePath)
     file_name, file_dir = Summary._get_file_info()
+    if len(text) > 4000:
+        print("待处理")
     text_go_sum = text[:4000]
     sumText = Summary.summary(text=text_go_sum, title=file_name, info=fileInfo)
     print("结果:\n" + sumText)
