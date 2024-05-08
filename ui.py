@@ -3,7 +3,7 @@ import os
 from smain import main
 from summary.util.text_from_mp3 import get_whisper_model
 from summary.config import (model_size_or_path,
-                            file_default_path)
+                            file_default_path, company_name)
 from fastapi import FastAPI
 
 app = FastAPI()
@@ -38,11 +38,12 @@ def doIt(summary_type, file_Path, file_get_type='upload', file_Info=None, re_run
 # C:\Users\lawrence\AppData\Local\Temp\gradio
 @app.get("/")
 def create_chain_app():
-    with gr.Blocks() as demo:
+    with gr.Blocks(title=company_name) as demo:
         with gr.Tab(label='上传转录'):
             with gr.Row():
                 media_upload_block = gr.File(file_count='single', file_types=['audio', 'video'],
                                              label='上传媒体文件', scale=6)
+                media_upload_block.GRADIO_CACHE = file_default_path
             with gr.Row():
                 input_textbox = gr.Textbox(label='媒体关键字', scale=10)
                 input_type = gr.Dropdown(label='生成摘要类型', choices=['总体摘要', '章节摘要'], value='章节摘要',
@@ -55,15 +56,18 @@ def create_chain_app():
                 output_textbox2 = gr.Textbox(lines=10, label='摘要文本', scale=6)
 
             submit_button.click(fn=doIt,
-                                inputs=[input_type, media_upload_block, gr.Textbox('upload'), input_textbox,
+                                inputs=[input_type, media_upload_block, gr.Textbox('upload', visible=False),
+                                        input_textbox,
                                         rerun_type],
                                 outputs=[output_textbox1, output_textbox2])
 
         with gr.Tab(label='选择转录'):
             with gr.Row():
+                media_files = [''] + [os.path.relpath(os.path.join(root, f), file_default_path) for root, dirs, files in
+                                      os.walk(file_default_path)
+                                      for f in files if f.endswith('.mp4') or f.endswith('.mp3')]
                 media_select_block = gr.Dropdown(label='选择媒体文件',
-                                                 choices=[''] + [f for f in os.listdir(file_default_path)
-                                                                 if f.endswith('.mp4')], scale=6)
+                                                 choices=media_files, scale=6)
             with gr.Row():
                 input_textbox = gr.Textbox(label='媒体关键字', scale=10)
                 input_type = gr.Dropdown(label='生成摘要类型', choices=['总体摘要', '章节摘要'], value='章节摘要',
@@ -76,7 +80,8 @@ def create_chain_app():
                 output_textbox2 = gr.Textbox(lines=10, label='摘要文本', scale=6)
             # print(media_select_block.value)
             submit_button.click(fn=doIt,
-                                inputs=[input_type, media_select_block, gr.Textbox('choose'), input_textbox,
+                                inputs=[input_type, media_select_block, gr.Textbox('choose', visible=False),
+                                        input_textbox,
                                         rerun_type],
                                 outputs=[output_textbox1, output_textbox2])
 
@@ -84,5 +89,5 @@ def create_chain_app():
 
 
 io = create_chain_app()
-CUSTOM_PATH = "/sotawork"
+CUSTOM_PATH = "/" + company_name
 app = gr.mount_gradio_app(app, io, path=CUSTOM_PATH)
