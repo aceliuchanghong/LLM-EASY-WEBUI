@@ -54,7 +54,7 @@ def get_mp3_from_mp4_2(file_path):
         return None
 
 
-def get_mp3_from_mp4(file_path):
+def get_mp3_from_video(file_path):
     file_name, file_dir = get_file_info(file_path)
     result = file_dir + "/" + file_name + ".mp3"
 

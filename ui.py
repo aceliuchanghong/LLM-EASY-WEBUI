@@ -40,6 +40,9 @@ def create_chain_app():
                 media_upload_block = gr.File(file_count='single', file_types=['audio', 'video'],
                                              label='上传媒体文件', scale=6)
                 media_upload_block.GRADIO_CACHE = file_default_path
+                video_component = gr.Video(label='视频预览', scale=3)
+                audio_component = gr.Audio(label='音频预览', scale=3)
+
             with gr.Row():
                 input_textbox = gr.Textbox(label='媒体关键字', scale=10)
                 input_type = gr.Dropdown(label='生成摘要类型', choices=['总体摘要', '章节摘要'], value='章节摘要',
@@ -56,12 +59,17 @@ def create_chain_app():
                                         input_textbox,
                                         rerun_type],
                                 outputs=[output_textbox1, output_textbox2])
+            media_upload_block.upload(fn=lambda x: x, inputs=[media_upload_block], outputs=[video_component])
+            media_upload_block.upload(fn=lambda x: x, inputs=[media_upload_block], outputs=[audio_component])
 
         with gr.Tab(label='选择转录'):
             with gr.Row():
                 media_files = get_media_files(file_default_path)
                 media_select_block = gr.Dropdown(label='选择媒体文件',
                                                  choices=media_files, scale=6)
+                video_component = gr.Video(label='视频预览', scale=3)
+                audio_component = gr.Audio(label='音频预览', scale=3)
+
             with gr.Row():
                 input_textbox = gr.Textbox(label='媒体关键字', scale=10)
                 input_type = gr.Dropdown(label='生成摘要类型', choices=['总体摘要', '章节摘要'], value='章节摘要',
@@ -72,12 +80,15 @@ def create_chain_app():
             with gr.Row():
                 output_textbox1 = gr.Textbox(lines=10, label='转录文本', scale=4)
                 output_textbox2 = gr.Textbox(lines=10, label='摘要文本', scale=6)
-            # print(media_select_block.value)
+
             submit_button.click(fn=doIt,
                                 inputs=[input_type, media_select_block, gr.Textbox('choose', visible=False),
                                         input_textbox,
                                         rerun_type],
                                 outputs=[output_textbox1, output_textbox2])
+
+            media_select_block.change(fn=lambda x: x, inputs=[media_select_block], outputs=[video_component])
+            media_select_block.change(fn=lambda x: x, inputs=[media_select_block], outputs=[audio_component])
 
     return demo
 
