@@ -72,7 +72,7 @@ def create_chain_app():
                 audio_preview = gr.Audio(label='音频预览', scale=3)
 
                 # Add a preview button to play the selected media file
-                preview_button = gr.Button(value='预览', variant='secondary', scale=2)
+                preview_button = gr.Button(value='预览', variant='secondary', scale=1)
                 preview_button.click(fn=lambda x: (f'{file_default_path}/{x}', f'{file_default_path}/{x}'),
                                      inputs=[media_select_block],
                                      outputs=[video_preview, audio_preview])
