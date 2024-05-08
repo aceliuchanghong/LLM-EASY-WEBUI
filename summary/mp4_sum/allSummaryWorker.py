@@ -17,7 +17,7 @@ class allSummaryWorker(Mp4SummaryWorker):
         if title:
             all_info += "\n视频标题:" + title
         if info:
-            all_info += "\n视频备注:" + info
+            all_info += "\n视频关键字备注:" + info
 
         this_prompt = allSummaryPromptStart + all_info + allSummaryPromptEnd
         print("开始生成总体摘要:")

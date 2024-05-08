@@ -18,7 +18,7 @@ reRunType = {
 }
 
 
-def doItTest(summary_type, file_Path, file_get_type='upload', file_Info=None, re_run=False):
+def doIt(summary_type, file_Path, file_get_type='upload', file_Info=None, re_run=False):
     if file_get_type == 'choose':
         file_Path = file_default_path + "/" + file_Path
     if file_Path.endswith('.mp3'):
@@ -44,17 +44,17 @@ def create_chain_app():
                 media_upload_block = gr.File(file_count='single', file_types=['audio', 'video'],
                                              label='上传媒体文件', scale=6)
             with gr.Row():
-                input_textbox = gr.Textbox(label='媒体文件描述', scale=10)
+                input_textbox = gr.Textbox(label='媒体关键字', scale=10)
                 input_type = gr.Dropdown(label='生成摘要类型', choices=['总体摘要', '章节摘要'], value='章节摘要',
                                          scale=2)
                 rerun_type = gr.Dropdown(label='是否重跑', choices=['否', '是'], value='否', scale=1)
                 submit_button = gr.Button(value='Generate', variant='primary', scale=4)
 
             with gr.Row():
-                output_textbox1 = gr.Textbox(lines=10, label='媒体文本', scale=4)
+                output_textbox1 = gr.Textbox(lines=10, label='转录文本', scale=4)
                 output_textbox2 = gr.Textbox(lines=10, label='摘要文本', scale=6)
 
-            submit_button.click(fn=doItTest,
+            submit_button.click(fn=doIt,
                                 inputs=[input_type, media_upload_block, gr.Textbox('upload'), input_textbox,
                                         rerun_type],
                                 outputs=[output_textbox1, output_textbox2])
@@ -65,26 +65,24 @@ def create_chain_app():
                                                  choices=[''] + [f for f in os.listdir(file_default_path)
                                                                  if f.endswith('.mp4')], scale=6)
             with gr.Row():
-                input_textbox = gr.Textbox(label='媒体文件描述', scale=10)
+                input_textbox = gr.Textbox(label='媒体关键字', scale=10)
                 input_type = gr.Dropdown(label='生成摘要类型', choices=['总体摘要', '章节摘要'], value='章节摘要',
                                          scale=2)
                 rerun_type = gr.Dropdown(label='是否重跑', choices=['否', '是'], value='否', scale=1)
                 submit_button = gr.Button(value='Generate', variant='primary', scale=4)
 
             with gr.Row():
-                output_textbox1 = gr.Textbox(lines=10, label='媒体文本', scale=4)
+                output_textbox1 = gr.Textbox(lines=10, label='转录文本', scale=4)
                 output_textbox2 = gr.Textbox(lines=10, label='摘要文本', scale=6)
             # print(media_select_block.value)
-            submit_button.click(fn=doItTest,
+            submit_button.click(fn=doIt,
                                 inputs=[input_type, media_select_block, gr.Textbox('choose'), input_textbox,
                                         rerun_type],
                                 outputs=[output_textbox1, output_textbox2])
-        with gr.Tab(label='Structure Tab'):
-            img = gr.Image(value='using_files/img/img.png', label='项目结构')
 
     return demo
 
 
 io = create_chain_app()
-CUSTOM_PATH = "/gradio"
+CUSTOM_PATH = "/sotawork"
 app = gr.mount_gradio_app(app, io, path=CUSTOM_PATH)
