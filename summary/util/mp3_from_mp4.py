@@ -54,9 +54,9 @@ def get_mp3_from_mp4_2(file_path):
         return None
 
 
-def get_mp3_from_video(file_path):
+def get_mp3_from_video(file_path, trans_type='mp3'):
     file_name, file_dir = get_file_info(file_path)
-    result = file_dir + "/" + file_name + ".mp3"
+    result = file_dir + "/" + file_name + "." + trans_type
 
     video = VideoFileClip(file_path)
     audio = video.audio
@@ -69,3 +69,24 @@ def get_mp3_from_video(file_path):
         print("视频转音频失败:" + file_path)
         print(e)
         return None
+
+
+def get_mp3_from_audio(file_path, trans_type='mp3'):
+    file_name, file_dir = get_file_info(file_path)
+    result = file_dir + "/" + file_name + "." + trans_type
+
+    audio = AudioFileClip(file_path)
+    audio.write_audiofile(result)
+    try:
+        audio.write_audiofile(result)
+        print("音频格式转化成功:" + result)
+        return result
+    except Exception as e:
+        print("音频格式转化失败:" + file_path)
+        print(e)
+        return None
+
+
+if __name__ == '__main__':
+    file = r'C:\Users\lawrence\Videos\waijiaobu.mp4.mp3'
+    wav_file = get_mp3_from_audio(file, 'wav')
