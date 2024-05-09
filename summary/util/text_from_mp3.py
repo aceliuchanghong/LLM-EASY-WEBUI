@@ -7,10 +7,10 @@ def get_whisper_model(model_size_or_path):
     return whisperModel
 
 
-def get_whisper_text(whisperModel, audio_path, mode="timeline"):
+def get_whisper_text(whisperModel, audio_path, initial_prompt="", mode="timeline"):
     transcription = ""
     try:
-        segments, info = whisperModel.transcribe(audio_path)
+        segments, info = whisperModel.transcribe(audio_path, initial_prompt=initial_prompt)
         # 1 以下一般版本
         if mode == "normal":
             transcription_segments = [segment.text for segment in segments]

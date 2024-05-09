@@ -56,7 +56,8 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
             mp3FilePath = filePath
         else:
             mp3FilePath = get_mp3_from_video(filePath)
-        text = get_whisper_text(whisperModel=whisperModel, audio_path=mp3FilePath, mode=SummaryMode.get(summaryType))
+        text = get_whisper_text(whisperModel=whisperModel, audio_path=mp3FilePath, initial_prompt=fileInfo,
+                                mode=SummaryMode.get(summaryType))
     else:
         text = None
     print("待总结:\n" + text)
