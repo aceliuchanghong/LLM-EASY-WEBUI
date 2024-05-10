@@ -9,7 +9,7 @@ company_name = 'sotawork'
 # sqlite
 LOG_LEVEL = "ERROR"
 db_path = "summary/media_sum.db"
-segment_length = 2048
+segment_length = 200
 allSummaryPromptStart = """
 我希望你是一名专业的视频内容编辑,帮我用中文总结内容精华.请用一句简短的话总结梗概,仅内容即可,不要其他任何修饰词,大概100-150字左右,内容如下:
 
