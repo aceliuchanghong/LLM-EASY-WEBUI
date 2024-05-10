@@ -37,8 +37,16 @@ SummaryPrompt = {
 
 
 def crack_long_text(text, Summary, file_name, fileInfo):
-    if len(text) <= segment_length:
-        return Summary.summary(text=text, title=file_name, info=fileInfo)
+    """
+    本来此处想要加一个处理长文本分段的总记得
+    :param text:
+    :param Summary:
+    :param file_name:
+    :param fileInfo:
+    :return:
+    """
+    # if len(text) <= segment_length:
+    #     return Summary.summary(text=text, title=file_name, info=fileInfo)
 
     sumText = ""
     total_segments = (len(text) + segment_length - 1) // segment_length  # 计算总段数
@@ -48,13 +56,14 @@ def crack_long_text(text, Summary, file_name, fileInfo):
         segment_index = i // segment_length + 1  # 计算当前段的索引
         print(f"正在处理第{segment_index}分段, 共{total_segments}段\n")
         segment_text = text[i:i + segment_length]
-        segment_summary = crack_long_text(segment_text, Summary, file_name, fileInfo)
+        # print("dealing:", segment_text)
+        segment_summary = Summary.summary(text=segment_text, title=file_name, info=fileInfo)
         sumText += segment_summary
 
-        # 检查合并后的总结文本长度是否超过segment_length
-        if len(sumText) > segment_length:
-            # 如果超过segment_length，则继续递归调用
-            return crack_long_text(sumText, Summary, file_name, fileInfo)
+        # # 检查合并后的总结文本长度是否超过segment_length
+        # if len(sumText) > segment_length:
+        #     # 如果超过segment_length，则继续递归调用
+        #     return crack_long_text(sumText, Summary, file_name, fileInfo)
 
     return sumText
 
@@ -99,12 +108,15 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
 
     sumText = crack_long_text(text, Summary, file_name, fileInfo)
 
-    print("开始合并摘要:\n", sumText, "\n可能需要等待一下")
-    sumTextAns = Summary.summary(text=sumText,
-                                 title=file_name,
-                                 info=fileInfo,
-                                 PromptStart=SummaryPrompt[summaryType][0],
-                                 PromptEnd=SummaryPrompt[summaryType][1])
+    if summaryType in ('SumTextAll', 'SumMp4All'):
+        print("开始合并摘要:\n", sumText, "\n可能需要等待一下")
+        sumTextAns = Summary.summary(text=sumText,
+                                     title=file_name,
+                                     info=fileInfo,
+                                     PromptStart=SummaryPrompt[summaryType][0],
+                                     PromptEnd=SummaryPrompt[summaryType][1])
+    else:
+        sumTextAns = sumText
     remark = "remark"
     print("结果:\n" + sumTextAns)
 

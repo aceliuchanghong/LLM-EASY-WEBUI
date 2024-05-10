@@ -25,5 +25,5 @@ class stepSummaryWorker(Mp4SummaryWorker):
         this_prompt = PromptStart + all_info + PromptEnd
         print("开始生成chapter摘要:\n")
         allSummary = llm.invoke(this_prompt).content
-        print(allSummary)
+        # print(allSummary)
         return allSummary
