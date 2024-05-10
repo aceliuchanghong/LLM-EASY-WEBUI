@@ -36,6 +36,11 @@ source activate myLLM_WEBUI
 cd LLM-EASY-WEBUI
 pip install -r requirements.txt
 
+# 修改summary/config.py:
+# 有一个音频模型文件需要提前下载好,修改model_size_or_path的路径(参考:/home/liuchanghong/faster-whisper-large-v3)
+# file_default_path这个是指自己传的文件路径,记得改 (参考:/home/liuchanghong/media_files)
+# 参考修改 db_path = "/home/liuchanghong/media_files/media_sum.db"
+
 # 找个目录下载
 wget https://github.com/Purfview/whisper-standalone-win/releases/download/libs/cuBLAS.and.cuDNN_CUDA11_linux_v4.7z
 7za x cuBLAS.and.cuDNN_CUDA11_linux_v4.7z
@@ -62,10 +67,10 @@ cp /home/liuchanghong/faster-whisper-large-v3/*.so.* $HOME/anaconda3/envs/mySumm
 # summaryType:SumMp4All,SumTextAll==>总体总结 SumMp4Step==>章节总结  
 # fileInfo==>视频说明,不是关键字
 # vi summary/config.py:
-# 有一个音频模型文件需要提前下载好,修改model_size_or_path的路径(/home/liuchanghong/faster-whisper-large-v3)
-# file_default_path这个是指自己传的文件路径,记得改 (/home/liuchanghong/media_files)
+# 有一个音频模型文件需要提前下载好(hf的faster-whisper-large-v3),模型地址:model_size_or_path
+# file_default_path这个是指自己上传的文件路径,记得改 (/home/liuchanghong/media_files)
 # 如果使用的官方key,里面openai_api_base记得改下(模型也可以改一下) 
-# 可以修改 db_path = "/home/liuchanghong/media_files/media_sum.db"
+# db_path 数据库地址
 ```
 
 测试执行语句,真正执行的时候做一个循环执行
@@ -107,4 +112,5 @@ python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_fi
 TODO
 
 - 增加docx,doc,excel,pdf,txt文件总结
-
+- 分人物说话
+- 对录音文件,做rag
