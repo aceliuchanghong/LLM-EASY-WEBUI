@@ -3,23 +3,23 @@
 ```text
 summary/
 |
-├── config.py
+├── ui.py                       *************** UI入口
+├── smain.py                    *************** cli入口
+├── config.py                   *************** 配置属性
+├── media_sum.db                *************** 数据库
 ├── readme.md
 ├── mp4_sum/
-│   ├── allSummaryWorker.py
-│   ├── core.py
-│   └── stepSummaryWorker.py
-├── text_sum/
-│   ├── allSummaryWorker.py
-│   └── core.py
+│   ├── allSummaryWorker.py     *************** 继承core,实现分步总结
+│   ├── core.py                 *************** 继承Worker,媒体总结抽象大类
+│   └── stepSummaryWorker.py    *************** 继承core,实现分步总结
 ├── util/
-│   ├── check_db.py
-│   ├── create_llm.py
-│   ├── mp3_from_mp4.py
-│   ├── text_from_file.py
-│   └── text_from_mp3.py
+│   ├── check_db.py             *************** 数据库工具函数
+│   ├── create_llm.py           *************** 大模型工具函数
+│   ├── mp3_from_mp4.py         *************** 媒体文件处理工具函数
+│   ├── speaker_recognition.py  *************** 没实现的分人物说话的工具函数
+│   └── text_from_mp3.py        *************** 工具函数
 └── worker/
-    └── Worker.py
+    └── Worker.py               *************** 根节点抽象类
 ```
 
 ```text
