@@ -4,9 +4,12 @@ from summary.util.create_llm import get_llm
 
 
 class allSummaryWorker(Mp4SummaryWorker):
-    def summary(self, text=None, title=None, info=None):
+    def summary(self, text=None, title=None, info=None, PromptStart=allSummaryPromptStart,
+                PromptEnd=allSummaryPromptEnd):
         """
         视频文本标题,文本附加信息==>总体摘要
+        :param PromptStart: 提示词开始
+        :param PromptEnd: 提示词结束
         :param text: 文本
         :param title: 文本标题
         :param info: 文本附加信息
@@ -19,7 +22,7 @@ class allSummaryWorker(Mp4SummaryWorker):
         if info:
             all_info += "\n视频关键字备注:" + info
 
-        this_prompt = allSummaryPromptStart + all_info + allSummaryPromptEnd
+        this_prompt = PromptStart + all_info + PromptEnd
         print("开始生成总体摘要:")
         allSummary = llm.invoke(this_prompt).content
         return allSummary

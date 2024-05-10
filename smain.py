@@ -4,7 +4,12 @@ from summary.config import (model_size_or_path,
                             table_del_url_sql,
                             table_add_sql,
                             create_table_sql,
-                            table_select_text_sql)
+                            table_select_text_sql,
+                            stepSummaryConnStart,
+                            stepSummaryConnEnd,
+                            allSummaryConnStart,
+                            allSummaryConnEnd,
+                            segment_length)
 from summary.mp4_sum.allSummaryWorker import allSummaryWorker
 from summary.mp4_sum.stepSummaryWorker import stepSummaryWorker
 import argparse
@@ -23,6 +28,11 @@ SummaryMode = {
     "SumMp4Step": "timeline",
     "SumMp4All": "timeline",
     "SumTextAll": "normal",
+}
+SummaryPrompt = {
+    "SumMp4Step": [stepSummaryConnStart, stepSummaryConnEnd],
+    "SumMp4All": [allSummaryConnStart, allSummaryConnEnd],
+    "SumTextAll": [allSummaryConnStart, allSummaryConnEnd],
 }
 
 
@@ -63,18 +73,30 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
     print("待总结:\n" + text)
     Summary = SummaryWorker.get(summaryType)(filePath)
     file_name, file_dir = Summary._get_file_info()
-    if len(text) > 4000:
-        print("待处理")
-    text_go_sum = text[:4000]
-    sumText = Summary.summary(text=text_go_sum, title=file_name, info=fileInfo)
-    print("结果:\n" + sumText)
+
+    sumText = ""
+    total_segments = (len(text) + segment_length - 1) // segment_length  # 计算总段数
+
+    for i in range(0, len(text), segment_length):
+        segment_index = i // segment_length + 1  # 计算当前段的索引
+        print(f"正在处理第{segment_index}分段, 共{total_segments}段")
+        text_go_sum = text[i:i + segment_length]
+        sumText += Summary.summary(text=text_go_sum, title=file_name, info=fileInfo)
+
+    print("开始合并摘要:\n", sumText)
+    sumTextAns = Summary.summary(text=sumText,
+                                 title=file_name,
+                                 info=fileInfo,
+                                 PromptStart=SummaryPrompt[summaryType][0],
+                                 PromptEnd=SummaryPrompt[summaryType][1])
+    print("结果:\n" + sumTextAns)
 
     # 存储进入数据库
     excute_sqlite_sql(
         table_add_sql,
-        (summaryType, filePath, text, fileInfo, sumText, str(datetime.now().strftime('%Y%m%d')), "remark"),
+        (summaryType, filePath, text, fileInfo, sumTextAns, str(datetime.now().strftime('%Y%m%d')), "remark"),
         False)
-    return text, sumText
+    return text, sumTextAns
 
 
 if __name__ == "__main__":

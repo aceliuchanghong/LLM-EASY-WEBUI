@@ -75,7 +75,8 @@ cp /home/liuchanghong/faster-whisper-large-v3/*.so.* $HOME/anaconda3/envs/mySumm
 python .\smain.py --summaryType SumMp4All --filePath "C:\Users\lawrence\Videos\yunyin.mp4" --fileInfo "说剑"
 python .\smain.py --summaryType SumMp4Step --filePath "C:\Users\lawrence\Videos\yunyin.mp4" --fileInfo "说剑"
 python .\smain.py --summaryType SumTextAll --filePath "C:\Users\lawrence\Videos\XX.pdf" --fileInfo "说剑"
-python .\smain.py --summaryType SumMp4Step --filePath "C:\Users\lawrence\Videos\yunyin.mp4" --fileInfo "说剑" --reRun
+python .\smain.py --summaryType SumMp4Step --filePath "C:\Users\lawrence\Videos\yunyin.mp4" --fileInfo "天子之剑，以燕溪石城为锋，齐岱为锷，晋魏为脊，周宋为镡，韩魏为夹" --reRun
+python .\smain.py --summaryType SumMp4All --filePath "C:\Users\lawrence\Videos\yunyin.mp4" --fileInfo "天子之剑，以燕溪石城为锋，齐岱为锷，晋魏为脊，周宋为镡，韩魏为夹" --reRun
 python .\smain.py --summaryType SumMp4All --filePath "C:\Users\lawrence\Videos\waijiaobu.mp4" --fileInfo "中国外交部发言"
 
 # 服务器测试语句
