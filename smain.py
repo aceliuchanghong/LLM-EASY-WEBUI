@@ -37,33 +37,31 @@ SummaryPrompt = {
 
 
 def crack_long_text(text, Summary, file_name, fileInfo):
-    """
-    本来此处想要加一个处理长文本分段的总记得
-    :param text:
-    :param Summary:
-    :param file_name:
-    :param fileInfo:
-    :return:
-    """
-    # if len(text) <= segment_length:
-    #     return Summary.summary(text=text, title=file_name, info=fileInfo)
-
     sumText = ""
     total_segments = (len(text) + segment_length - 1) // segment_length  # 计算总段数
 
     # 分段处理
-    for i in range(0, len(text), segment_length):
-        segment_index = i // segment_length + 1  # 计算当前段的索引
+    start_index = 0
+    for i in range(0, total_segments):
+        segment_index = i + 1  # 计算当前段的索引
         print(f"正在处理第{segment_index}分段, 共{total_segments}段\n")
-        segment_text = text[i:i + segment_length]
+
+        # 确保分割点在segment_length之前
+        segment_text = text[start_index:start_index + segment_length].strip()
+
+        # 找到最近的换行符位置
+        newline_pos = text.find('\n', start_index + segment_length, start_index + segment_length + segment_length)
+        if newline_pos != -1:
+            # 如果找到了换行符，确保分割点在换行符之前
+            segment_text = text[start_index:newline_pos].strip()
+            start_index = newline_pos + 1  # 更新下一个分段的起始点
+        else:
+            # 如果没有找到换行符，确保分割点在segment_length之前
+            start_index += segment_length  # 更新下一个分段的起始点
+
         # print("dealing:", segment_text)
         segment_summary = Summary.summary(text=segment_text, title=file_name, info=fileInfo)
         sumText += segment_summary
-
-        # # 检查合并后的总结文本长度是否超过segment_length
-        # if len(sumText) > segment_length:
-        #     # 如果超过segment_length，则继续递归调用
-        #     return crack_long_text(sumText, Summary, file_name, fileInfo)
 
     return sumText
 
