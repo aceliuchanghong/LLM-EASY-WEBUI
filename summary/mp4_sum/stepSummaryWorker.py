@@ -23,6 +23,7 @@ class stepSummaryWorker(Mp4SummaryWorker):
             all_info += "\n视频关键字备注:" + info
 
         this_prompt = PromptStart + all_info + PromptEnd
-        print("开始生成chapter摘要:")
+        print("开始生成chapter摘要:\n")
         allSummary = llm.invoke(this_prompt).content
+        print(allSummary)
         return allSummary

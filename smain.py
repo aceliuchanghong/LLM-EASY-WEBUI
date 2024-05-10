@@ -36,6 +36,29 @@ SummaryPrompt = {
 }
 
 
+def crack_long_text(text, Summary, file_name, fileInfo):
+    if len(text) <= segment_length:
+        return Summary.summary(text=text, title=file_name, info=fileInfo)
+
+    sumText = ""
+    total_segments = (len(text) + segment_length - 1) // segment_length  # 计算总段数
+
+    # 分段处理
+    for i in range(0, len(text), segment_length):
+        segment_index = i // segment_length + 1  # 计算当前段的索引
+        print(f"正在处理第{segment_index}分段, 共{total_segments}段\n")
+        segment_text = text[i:i + segment_length]
+        segment_summary = crack_long_text(segment_text, Summary, file_name, fileInfo)
+        sumText += segment_summary
+
+        # 检查合并后的总结文本长度是否超过segment_length
+        if len(sumText) > segment_length:
+            # 如果超过segment_length，则继续递归调用
+            return crack_long_text(sumText, Summary, file_name, fileInfo)
+
+    return sumText
+
+
 def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
     """
     插入数据库信息:
@@ -74,27 +97,21 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
     Summary = SummaryWorker.get(summaryType)(filePath)
     file_name, file_dir = Summary._get_file_info()
 
-    sumText = ""
-    total_segments = (len(text) + segment_length - 1) // segment_length  # 计算总段数
+    sumText = crack_long_text(text, Summary, file_name, fileInfo)
 
-    for i in range(0, len(text), segment_length):
-        segment_index = i // segment_length + 1  # 计算当前段的索引
-        print(f"正在处理第{segment_index}分段, 共{total_segments}段")
-        text_go_sum = text[i:i + segment_length]
-        sumText += Summary.summary(text=text_go_sum, title=file_name, info=fileInfo)
-
-    print("开始合并摘要:\n", sumText)
+    print("开始合并摘要:\n", sumText, "\n可能需要等待一下")
     sumTextAns = Summary.summary(text=sumText,
                                  title=file_name,
                                  info=fileInfo,
                                  PromptStart=SummaryPrompt[summaryType][0],
                                  PromptEnd=SummaryPrompt[summaryType][1])
+    remark = "remark"
     print("结果:\n" + sumTextAns)
 
     # 存储进入数据库
     excute_sqlite_sql(
         table_add_sql,
-        (summaryType, filePath, text, fileInfo, sumTextAns, str(datetime.now().strftime('%Y%m%d')), "remark"),
+        (summaryType, filePath, text, fileInfo, sumTextAns, str(datetime.now().strftime('%Y%m%d')), remark),
         False)
     return text, sumTextAns
 
