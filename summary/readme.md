@@ -9,7 +9,7 @@ summary/
 ├── media_sum.db                *************** 数据库
 ├── readme.md
 ├── mp4_sum/
-│   ├── allSummaryWorker.py     *************** 继承core,实现分步总结
+│   ├── allSummaryWorker.py     *************** 继承core,实现总体总结
 │   ├── core.py                 *************** 继承Worker,媒体总结抽象大类
 │   └── stepSummaryWorker.py    *************** 继承core,实现分步总结
 ├── util/
