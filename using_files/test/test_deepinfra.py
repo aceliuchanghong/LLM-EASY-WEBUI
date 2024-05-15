@@ -9,7 +9,7 @@ from langchain.chains import LLMChain
 
 DEEPINFRA_API_KEY = os.getenv('DEEPINFRA_API_KEY')
 
-llm = DeepInfra(model_id=config.MODEL)
+llm = DeepInfra(model_id=config.LLM_MODEL_NAME)
 llm.model_kwargs = {
     "temperature": 0.7,
     "top_p": 0.9,

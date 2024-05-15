@@ -1,11 +1,15 @@
-CHROMA_DIR = "../siscon_no_chroma_db"
-DATA_NAME = 'novel_essay'
-MODEL = 'meta-llama/Meta-Llama-3-70B-Instruct'
-DATA_PATH = '../Data'
+import os
+
+LLM_MODEL_NAME = 'meta-llama/Meta-Llama-3-70B-Instruct'
+LLM_BASE_URL = 'https://api.deepinfra.com/v1/openai'
+DEEPINFRA_API_KEY = os.getenv('DEEPINFRA_API_KEY')
 EMBEDDING_MODEL = 'BAAI/bge-large-en-v1.5'
 
 file_default_path = r'C:\Users\lawrence\Documents\upload'
 upload_type = ['.md', '.txt', '.pdf']
+
+MILVUS_API_TOKEN = os.getenv("MILVUS_API_TOKEN")
+MilvusClientUrl = 'https://in03-aa941e2a2cd2371.api.gcp-us-west1.zillizcloud.com'
 
 examples = ['帮我猫咪起一个名字,不要问我意见.', '我的猫咪叫什么?', '1+1=?', '你是哪个模型?', 'python写一个冒泡排序.',
             '介绍下NLP.',

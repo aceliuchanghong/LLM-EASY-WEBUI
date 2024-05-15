@@ -2,7 +2,6 @@ import gradio as gr
 import os
 from langchain_openai import ChatOpenAI
 from langchain_community.document_loaders import DirectoryLoader
-from langchain_community.vectorstores import Chroma
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
@@ -11,12 +10,10 @@ import ast
 
 from chatAll import config
 
-DEEPINFRA_API_KEY = os.getenv('DEEPINFRA_API_KEY')
-
 model = ChatOpenAI(
-    base_url="https://api.deepinfra.com/v1/openai",
-    api_key=DEEPINFRA_API_KEY,
-    model="meta-llama/Meta-Llama-3-70B-Instruct"
+    base_url=config.LLM_BASE_URL,
+    api_key=config.DEEPINFRA_API_KEY,
+    model=config.LLM_MODEL_NAME
 )
 
 
@@ -32,13 +29,6 @@ def load_documents(directory):
 
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
-
-
-def get_retriever(split_docs, embedding):
-    db = Chroma.from_documents(documents=split_docs, embedding=embedding, persist_directory=config.CHROMA_DIR)
-    retriever = db.as_retriever()
-    # print(retriever.invoke("万清平是谁?"))
-    return retriever
 
 
 def getChain(retriever, llm):
@@ -127,8 +117,6 @@ def get_text_files(file_default_path):
 
 
 def upload_file(file, rerun='否'):
-    # 读取文件内容
-    # print(file, rerun)
     return read_file(file)
 
 
