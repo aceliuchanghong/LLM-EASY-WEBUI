@@ -1,6 +1,13 @@
 import gradio as gr
 import os
 from langchain_openai import ChatOpenAI
+from langchain_community.document_loaders import DirectoryLoader
+from langchain_community.vectorstores import Chroma
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables import RunnablePassthrough
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+import ast
 
 from chatAll import config
 
@@ -11,6 +18,46 @@ model = ChatOpenAI(
     api_key=DEEPINFRA_API_KEY,
     model="meta-llama/Meta-Llama-3-70B-Instruct"
 )
+
+
+def load_documents(directory):
+    loader = DirectoryLoader(directory)
+    documents = loader.load()
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1024, chunk_overlap=100, add_start_index=True
+    )
+    split_docs = text_splitter.split_documents(documents)
+    return split_docs
+
+
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
+
+def get_retriever(split_docs, embedding):
+    db = Chroma.from_documents(documents=split_docs, embedding=embedding, persist_directory=config.CHROMA_DIR)
+    retriever = db.as_retriever()
+    # print(retriever.invoke("万清平是谁?"))
+    return retriever
+
+
+def getChain(retriever, llm):
+    # 修改之后的prompt模板
+    prompt = PromptTemplate.from_template("""根据文本回答问题:
+    {context}
+    问题:
+    {question}
+    不清楚就回答:"DK"
+    """)
+    # chain
+    my_chain = ({"context": retriever | format_docs, "question": RunnablePassthrough()}
+                | prompt
+                | llm
+                | StrOutputParser()
+                )
+    # question = "夸告矢找谁?"
+    # print(my_chain.invoke({"question": question}))
+    return my_chain
 
 
 def add_text(history, text):
@@ -86,27 +133,28 @@ def upload_file(file, rerun='否'):
 
 
 def read_file(file):
-    encodings = ['utf-8', 'gbk']  # 尝试的编码格式列表
-    for encoding in encodings:
-        try:
-            with open(file, encoding=encoding) as f:
-                content = f.read()
-            return content
-        except UnicodeDecodeError:
-            # 如果以当前编码格式读取文件失败，则尝试下一个编码格式
-            continue
-    # 如果所有编码格式都失败，则抛出异常
-    return "Could not decode file with specified encodings"
+    file_type1 = ['.txt', '.md']
+    if file.endswith(tuple(file_type1)):
+        encodings = ['utf-8', 'gbk']  # 尝试的编码格式列表
+        for encoding in encodings:
+            try:
+                with open(file, encoding=encoding) as f:
+                    content = f.read()
+                return content
+            except UnicodeDecodeError:
+                # 如果以当前编码格式读取文件失败，则尝试下一个编码格式
+                continue
+        # 如果所有编码格式都失败，则抛出异常
+        return "Could not decode file with specified encodings"
+    else:
+        return file + " not support"
 
 
 def choose_file(file, text_files_short):
     # 替换字符串中的单引号为双引号，以符合Python字典的格式
     str_value = text_files_short.replace("'", '"')
-    import ast
-    # 使用ast.literal_eval()将字符串转换为字典
     dict_value = ast.literal_eval(str_value)
 
-    # print(dict_value.get(file))
     # 读取文件内容
     file_path = config.file_default_path + "/" + dict_value.get(file)
     return read_file(file_path)
@@ -141,6 +189,11 @@ def generate_response_with_file(history, query):
 def clear_history(history):
     history.clear()
     return history, ""
+
+
+def clear_history2(history, show_text):
+    history.clear()
+    return history, "", ""
 
 
 if __name__ == '__main__':
