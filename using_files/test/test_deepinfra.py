@@ -2,7 +2,7 @@ import os
 
 from langchain.memory import ConversationBufferWindowMemory
 
-import config
+from chatAll import config
 from langchain_community.llms import DeepInfra
 from langchain_core.prompts import PromptTemplate
 from langchain.chains import LLMChain

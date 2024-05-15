@@ -10,8 +10,7 @@ from langchain_core.runnables import RunnablePassthrough
 from langchain_openai import ChatOpenAI
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-import config
-import time
+from chatAll import config
 
 # Load environment variables
 DEEPINFRA_API_KEY = os.getenv('DEEPINFRA_API_KEY')
@@ -74,32 +73,41 @@ def getChain(retriever):
 
 
 def create_chain_app():
-    with gr.Blocks() as demo:
+    with gr.Blocks(title="Chatbot") as demo:
         with gr.Tab(label='Chat-Tab'):
             chatbot = gr.Chatbot(
                 [],
                 label="chatBot",
                 elem_id="chatBot",
-                avatar_images=(None, (os.path.join(os.path.dirname(__file__), "../img", "avatar.jpg"))),
+                avatar_images=((os.path.join(os.path.dirname(__file__), "../img", "user.png")),
+                               (os.path.join(os.path.dirname(__file__), "../img", "avatar.jpg"))),
                 bubble_full_width=False,
                 height="600px",
             )
+
             with gr.Row():
-                chat_input = gr.Textbox(scale=10, interactive=True, lines=5, show_label=False,
+                chat_input = gr.Textbox(scale=10, interactive=True, lines=3, show_label=False, render=False,
                                         placeholder="愿起一剑杀万劫...")
+                gr.Examples(config.examples, chat_input, label='示例')
+            with gr.Row():
+                chat_input.render()
                 submit_button = gr.Button(value='Chat', variant='primary', scale=4)
                 clear_button = gr.Button(scale=2, value="Clear", variant="secondary")
         with gr.Tab(label='File-Chat-Tab'):
-            filechatbot = gr.Chatbot(
-                [],
-                label="fileChatBot",
-                elem_id="fileChatBot",
-                avatar_images=(None, (os.path.join(os.path.dirname(__file__), "../img", "avatar.jpg"))),
-                bubble_full_width=False,
-                height="600px",
-            )
             with gr.Row():
-                file_chat_input = gr.MultimodalTextbox(scale=10, interactive=True, file_types=["text"],
+                filechatbot = gr.Chatbot(
+                    [],
+                    label="fileChatBot",
+                    elem_id="fileChatBot",
+                    avatar_images=((os.path.join(os.path.dirname(__file__), "../img", "user.png")),
+                                   (os.path.join(os.path.dirname(__file__), "../img", "avatar.jpg"))),
+                    bubble_full_width=False,
+                    height=600,
+                )
+                show_img = gr.Image(label='File Preview', height=600)
+
+            with gr.Row():
+                file_chat_input = gr.MultimodalTextbox(interactive=True, file_types=['.md', '.txt', '.pdf'],
                                                        placeholder="上传文件开始聊天吧....", show_label=False)
         with gr.Tab(label='Structure-Tab'):
             img = gr.Image('using_files/img/img.png')
