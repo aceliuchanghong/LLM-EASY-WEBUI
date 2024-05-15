@@ -1,33 +1,13 @@
 import gradio as gr
 import os
-
 from langchain_community.document_loaders import DirectoryLoader
-from langchain_community.embeddings import DeepInfraEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
-from langchain_openai import ChatOpenAI
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-
 from chatAll import config
 from chatAll.utils import add_text, generate_response, clear_history
-
-# Load environment variables
-DEEPINFRA_API_KEY = os.getenv('DEEPINFRA_API_KEY')
-
-# Initialize the language model
-llm = ChatOpenAI(
-    base_url="https://api.deepinfra.com/v1/openai",
-    api_key=DEEPINFRA_API_KEY,
-    model="meta-llama/Meta-Llama-3-70B-Instruct"
-)
-
-embedding = DeepInfraEmbeddings(
-    model_id="BAAI/bge-large-en-v1.5",
-    query_instruction="",
-    embed_instruction="",
-)
 
 DATA_PATH = config.DATA_PATH
 CHROMA_DIR = config.CHROMA_DIR
@@ -54,7 +34,7 @@ def get_retriever(split_docs, embedding):
     return retriever
 
 
-def getChain(retriever):
+def getChain(retriever, llm):
     # 修改之后的prompt模板
     prompt = PromptTemplate.from_template("""根据文本回答问题:
     {context}
