@@ -11,6 +11,7 @@ from langchain_openai import ChatOpenAI
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from chatAll import config
+from chatAll.utils import add_text, generate_response, clear_history
 
 # Load environment variables
 DEEPINFRA_API_KEY = os.getenv('DEEPINFRA_API_KEY')
@@ -75,32 +76,37 @@ def getChain(retriever):
 def create_chain_app():
     with gr.Blocks(title="Chatbot") as demo:
         with gr.Tab(label='Chat-Tab'):
-            chatbot = gr.Chatbot(
+            text_chatbot1 = gr.Chatbot(
                 [],
                 label="chatBot",
                 elem_id="chatBot",
-                avatar_images=((os.path.join(os.path.dirname(__file__), "../img", "user.png")),
-                               (os.path.join(os.path.dirname(__file__), "../img", "avatar.jpg"))),
+                avatar_images=((os.path.join(os.path.dirname(__file__), "using_files/img", "user.png")),
+                               (os.path.join(os.path.dirname(__file__), "using_files/img", "avatar.jpg"))),
                 bubble_full_width=False,
                 height="600px",
             )
 
             with gr.Row():
-                chat_input = gr.Textbox(scale=10, interactive=True, lines=3, show_label=False, render=False,
-                                        placeholder="愿起一剑杀万劫...")
-                gr.Examples(config.examples, chat_input, label='示例')
+                chat_text_input1 = gr.Textbox(scale=10, interactive=True, lines=3, show_label=False, render=False,
+                                              placeholder="愿起一剑杀万劫...")
+                examples_zh = []
+                for i in config.examples:
+                    ans = i + " " + "中文回答"
+                    examples_zh.append(ans)
+                gr.Examples(examples_zh, chat_text_input1, label='示例')
             with gr.Row():
-                chat_input.render()
-                submit_button = gr.Button(value='Chat', variant='primary', scale=4)
-                clear_button = gr.Button(scale=2, value="Clear", variant="secondary")
+                chat_text_input1.render()
+                text_submit_button1 = gr.Button(value='Chat', variant='primary', scale=4)
+                text_clear_button1 = gr.Button(scale=2, value="Clear", variant="secondary")
+
         with gr.Tab(label='File-Chat-Tab'):
             with gr.Row():
                 filechatbot = gr.Chatbot(
                     [],
                     label="fileChatBot",
                     elem_id="fileChatBot",
-                    avatar_images=((os.path.join(os.path.dirname(__file__), "../img", "user.png")),
-                                   (os.path.join(os.path.dirname(__file__), "../img", "avatar.jpg"))),
+                    avatar_images=((os.path.join(os.path.dirname(__file__), "using_files/img", "user.png")),
+                                   (os.path.join(os.path.dirname(__file__), "using_files/img", "avatar.jpg"))),
                     bubble_full_width=False,
                     height=600,
                 )
@@ -111,6 +117,12 @@ def create_chain_app():
                                                        placeholder="上传文件开始聊天吧....", show_label=False)
         with gr.Tab(label='Structure-Tab'):
             img = gr.Image('using_files/img/img.png')
+
+        # queue=False参数，这意味着点击按钮后，只有当当前事件处理完成后，才能再次点击按钮。
+        text_submit_button1.click(add_text, inputs=[text_chatbot1, chat_text_input1], outputs=[text_chatbot1],
+                                  queue=False).success(generate_response, inputs=[text_chatbot1, chat_text_input1],
+                                                       outputs=[text_chatbot1, chat_text_input1])
+        text_clear_button1.click(clear_history, inputs=text_chatbot1, outputs=[text_chatbot1, chat_text_input1])
 
     return demo
 
