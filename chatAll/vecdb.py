@@ -25,29 +25,67 @@ def load_file(file_path):
         return data
 
 
-def split_docs(data):
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1024, chunk_overlap=100, add_start_index=True
-    )
+def get_split_docs(data):
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=100, add_start_index=True)
     split_docs = text_splitter.split_documents(data)
     return split_docs
 
 
 def get_chunk(split_docs):
+    # https://milvus.io/docs/quickstart.md
+    """
+    "embeddings":
+    [[
+      0.0,
+      0.5,
+      1.0
+    ],[
+      1.0,
+      0.5,
+      0.0
+    ],...]
+    怎么插入呢?之后考虑
+    :param split_docs:
+    :return:
+    """
+    chunks = []
+    dit = {}
+    for split_doc in split_docs:
+        embeddings_chunk_idx = split_doc.metadata['start_index']
+        embeddings_result = embeddings.embed_documents(split_doc.page_content)
+        embeddings_chunk = split_doc.page_content
+        embeddings_file_source = split_doc.metadata['source']
+
+        dit['id'] = embeddings_chunk_idx
+        dit['vector'] = embeddings_result
+        dit['text'] = embeddings_chunk
+        dit['dim'] = len(embeddings_result[0])
+        dit['file'] = embeddings_file_source
+        chunks.append(dit)
+    return chunks
+
+
+def db_insert(file_name, dimension, chunks, metric_type):
     pass
 
 
 if __name__ == '__main__':
+    # 测试数据
     test_txt = '../using_files/data/00.txt'
+    test_txt2 = r'C:\Users\lawrence\PycharmProjects\FAQ_Of_LLM_Interview\pytorch\data\books\hongLouMeng.txt'
     test_md = r'C:\Users\lawrence\Desktop\travel_tips\travel_tips.md'
     test_pdf = r'C:\Users\lawrence\Desktop\别人简历\简历-桂先生.pdf'
     test_py = 'config.py'
 
     start = time.time()
     data = load_file(test_txt)
-    split_docs = split_docs(data)
+    split_docs = get_split_docs(data)
     for doc in split_docs:
         print(doc)
+        print(doc.metadata['source'])
+        print(doc.metadata['start_index'])
+        print(doc.page_content)
+    print(get_chunk(split_docs))
     end = time.time()
 
     execution_time_seconds = end - start

@@ -1,11 +1,9 @@
 import gradio as gr
 import os
 from langchain_openai import ChatOpenAI
-from langchain_community.document_loaders import DirectoryLoader
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
-from langchain_text_splitters import RecursiveCharacterTextSplitter
 import ast
 
 from chatAll import config
@@ -15,16 +13,6 @@ model = ChatOpenAI(
     api_key=config.DEEPINFRA_API_KEY,
     model=config.LLM_MODEL_NAME
 )
-
-
-def load_documents(directory):
-    loader = DirectoryLoader(directory)
-    documents = loader.load()
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1024, chunk_overlap=100, add_start_index=True
-    )
-    split_docs = text_splitter.split_documents(documents)
-    return split_docs
 
 
 def format_docs(docs):
