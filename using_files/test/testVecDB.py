@@ -17,6 +17,7 @@ client = MilvusClient(
 #     dimension=5
 # )
 
+# 采取
 # schema = MilvusClient.create_schema(
 #     auto_id=False,
 #     enable_dynamic_field=True,
