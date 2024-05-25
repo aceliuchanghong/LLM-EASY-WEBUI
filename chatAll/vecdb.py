@@ -6,7 +6,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import DeepInfraEmbeddings
 from chatAll import config
 from pymilvus import MilvusClient, DataType
-
+from tqdm import tqdm
+import concurrent.futures
 from chatAll.utils import model
 
 import logging
@@ -44,7 +45,7 @@ def load_file(file_path):
         return data
 
 
-def get_split_docs(data, re_run=False):
+def get_split_docs(data):
     logger.info("Starting to split documents.")
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=100, add_start_index=True)
     split_docs = text_splitter.split_documents(data)
@@ -53,8 +54,9 @@ def get_split_docs(data, re_run=False):
 
 
 # https://milvus.io/docs/quickstart.md
-def get_chunk(split_docs, re_run=False):
+def get_chunk2(split_docs, re_run=False):
     chunks = []
+    i = 0
     for split_doc in split_docs:
         embeddings_chunk_idx = split_doc.metadata['start_index']
         embeddings_result = embeddings.embed_documents([split_doc.page_content])
@@ -64,7 +66,39 @@ def get_chunk(split_docs, re_run=False):
         dit['my_vector'] = embeddings_result[0]
         dit['my_text'] = embeddings_chunk
         chunks.append(dit)
+        print("Embedding i:", i)
+        i += 1
     logger.info("Embedding successfully.")
+    return chunks
+
+
+def embed_document(split_doc):
+    embeddings_chunk_idx = split_doc.metadata['start_index']
+    embeddings_result = embeddings.embed_documents([split_doc.page_content])
+    embeddings_chunk = split_doc.page_content
+    dit = {}
+    dit['my_id'] = embeddings_chunk_idx
+    dit['my_vector'] = embeddings_result[0]
+    dit['my_text'] = embeddings_chunk
+    return dit
+
+
+def get_chunk(split_docs):
+    chunks = []
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        # 使用ThreadPoolExecutor并行处理文档
+        future_to_doc = {executor.submit(embed_document, doc): doc for doc in split_docs}
+        # 使用tqdm来显示进度条
+        for future in tqdm(concurrent.futures.as_completed(future_to_doc), total=len(split_docs),
+                           desc="Embedding documents"):
+            doc = future_to_doc[future]
+            try:
+                # 获取结果并添加到chunks列表中
+                chunk = future.result()
+                chunks.append(chunk)
+                # logger.info("Embedding successfully for document with index: %s", chunk['my_id'])
+            except Exception as e:
+                logger.error("Embedding failed for document with index: %s. Error: %s", doc.metadata['start_index'], e)
     return chunks
 
 
@@ -102,10 +136,12 @@ def db_insert(collection_name, chunks, client, metric_type='COSINE', dim=1024, m
         except Exception as e:
             print(f'Milvus创建collection:{collection_name}时出错', str(e))
         try:
-            client.insert(
-                collection_name=collection_name,
-                data=chunks
-            )
+            for i in range(0, len(chunks), 99):
+                client.insert(
+                    collection_name=collection_name,
+                    data=chunks[i:i + 99]
+                )
+                # print('i', i)
             # {'insert_count': 3, 'ids': [0, 867, 1745]}
         except Exception as e:
             print('Milvus插入出错', str(e))
@@ -117,19 +153,27 @@ if __name__ == '__main__':
     test_txt = '../using_files/data/00.txt'
     test_txt2 = r'C:\Users\lawrence\PycharmProjects\FAQ_Of_LLM_Interview\pytorch\data\books\hongLouMeng.txt'
     test_pdf = r'C:\Users\lawrence\Desktop\别人简历\简历-桂先生.pdf'
-    test_py = 'config.py'
     collection_name = 'liu'
-    query = "宝玉和谁结婚了?"
+    query = "宝玉和谁成亲了?"
     # query = "夸告矢找谁?"
     output_fields = "my_text"
     re_run = False
 
     start = time.time()
-    data = load_file(test_txt)
-    split_docs = get_split_docs(data, re_run=re_run)
-    chunks = get_chunk(split_docs, re_run=re_run)
-    db_insert(collection_name=collection_name, chunks=chunks, client=client, re_run=re_run)
+    data = load_file(test_txt2)
+    split_docs = get_split_docs(data)
+    print('split_docs:', len(split_docs))
+
+    collections = client.list_collections()
+    hasIt = False
+    if collection_name in collections:
+        hasIt = True
+    if not hasIt or re_run:
+        chunks = get_chunk(split_docs)
+        db_insert(collection_name=collection_name, chunks=chunks, client=client, re_run=re_run)
+
     query_vec = embeddings.embed_documents([query])
+    print(query_vec)
     res = client.search(
         collection_name=collection_name,
         data=query_vec,
@@ -145,7 +189,7 @@ if __name__ == '__main__':
             concatenated_text += item['entity'][output_fields]
 
     prompt = "根据以下内容给出中文回答:\n{begin}\n" + concatenated_text + "\n{end}\n问题:\n" + query + "\n不清楚就回答:DK"
-    # print(prompt)
+    print(prompt)
     print(query, "\n", model.invoke(prompt).content.strip())
     end = time.time()
 
