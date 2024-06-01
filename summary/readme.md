@@ -76,6 +76,12 @@ cp /home/liuchanghong/faster-whisper-large-v3/*.so.* $HOME/anaconda3/envs/mySumm
 测试执行语句,真正执行的时候做一个循环执行
 
 ```shell
+# UI界面,不要传大视频,真的会卡掉的,掉了需要重拉,记得开端口
+nohup uvicorn ui:app --port 9898 > unicore.log &
+(uvicorn ui:app --port 9898 --host 0.0.0.0)
+# 或者
+python ui.py
+
 # 本机测试语句 重跑的话增加 --reRun
 python .\smain.py --summaryType SumMp4All --filePath "C:\Users\lawrence\Videos\yunyin.mp4" --fileInfo "说剑"
 python .\smain.py --summaryType SumMp4Step --filePath "C:\Users\lawrence\Videos\yunyin.mp4" --fileInfo "说剑"
@@ -93,10 +99,7 @@ cd /home/liuchanghong/LLM-EASY-WEBUI
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言"
 python smain.py --summaryType SumMp4All --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言"
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/LLM-EASY-WEBUI/summary/test/waijiaobu.mp4" --fileInfo "中国外交部发言" --reRun
-# UI界面,不要传大视频,真的会卡掉的,掉了需要重拉,记得开端口
-nohup uvicorn ui:app --port 9898 > unicore.log &
-# 或者
-python sUI.py
+
 # 建议测试这2个,我只跑了这2个
 python smain.py --summaryType SumMp4Step --filePath "/home/liuchanghong/media_files/企业文化讲解1.mp4" --fileInfo "格莱美企业文化宣讲"
 python smain.py --summaryType SumMp4All --filePath "/home/liuchanghong/media_files/企业文化讲解1.mp4" --fileInfo "格莱美企业文化宣讲"
