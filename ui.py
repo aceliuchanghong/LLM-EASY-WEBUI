@@ -11,6 +11,7 @@ app = FastAPI()
 SummaryType = {
     "总体摘要": "SumMp4All",
     "章节摘要": "SumMp4Step",
+    "总体纪要": "SumTextAll",
 }
 
 reRunType = {
@@ -46,7 +47,8 @@ def create_chain_app():
 
             with gr.Row():
                 input_textbox = gr.Textbox(label='媒体关键字', scale=10)
-                input_type = gr.Dropdown(label='生成摘要类型', choices=['总体摘要', '章节摘要'], value='章节摘要',
+                input_type = gr.Dropdown(label='生成摘要类型', choices=['章节摘要', '总体摘要', '总体纪要'],
+                                         value='总体纪要',
                                          scale=2)
                 rerun_type = gr.Dropdown(label='是否重跑', choices=['否', '是'], value='否', scale=1)
                 submit_button = gr.Button(value='Generate', variant='primary', scale=4)
@@ -79,7 +81,8 @@ def create_chain_app():
 
             with gr.Row():
                 input_textbox = gr.Textbox(label='媒体关键字', scale=10)
-                input_type = gr.Dropdown(label='生成摘要类型', choices=['总体摘要', '章节摘要'], value='章节摘要',
+                input_type = gr.Dropdown(label='生成摘要类型', choices=['总体摘要', '章节摘要', '总体纪要'],
+                                         value='总体纪要',
                                          scale=2)
                 rerun_type = gr.Dropdown(label='是否重跑', choices=['否', '是'], value='否', scale=1)
                 submit_button = gr.Button(value='Generate', variant='primary', scale=4)

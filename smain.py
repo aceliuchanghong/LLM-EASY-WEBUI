@@ -9,12 +9,14 @@ from summary.config import (model_size_or_path,
                             stepSummaryConnEnd,
                             allSummaryConnStart,
                             allSummaryConnEnd,
-                            segment_length)
+                            segment_length,
+                            textAllSummaryConnEnd,
+                            textAllSummaryConnStart)
 from summary.mp4_sum.allSummaryWorker import allSummaryWorker
 from summary.mp4_sum.stepSummaryWorker import stepSummaryWorker
 import argparse
 from datetime import datetime
-from summary.text_sum.allSummaryWorker import allTextSummaryWorker
+from summary.text_sum.textAllSummaryWorker import allTextSummaryWorker
 from summary.util.check_db import check, excute_sqlite_sql
 from summary.util.mp3_from_mp4 import is_audio_file, get_mp3_from_video
 from summary.util.text_from_mp3 import get_whisper_model, get_whisper_text
@@ -27,12 +29,12 @@ SummaryWorker = {
 SummaryMode = {
     "SumMp4Step": "timeline",
     "SumMp4All": "timeline",
-    "SumTextAll": "normal",
+    "SumTextAll": "timeline",
 }
 SummaryPrompt = {
     "SumMp4Step": [stepSummaryConnStart, stepSummaryConnEnd],
     "SumMp4All": [allSummaryConnStart, allSummaryConnEnd],
-    "SumTextAll": [allSummaryConnStart, allSummaryConnEnd],
+    "SumTextAll": [textAllSummaryConnStart, textAllSummaryConnEnd],
 }
 
 
@@ -90,8 +92,7 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
         return filePath + "文件不存在", "总结失败"
 
     # 开始执行
-    if summaryType in ('SumMp4All', 'SumMp4Step'):
-        # print(is_audio_file(filePath))
+    if summaryType in ('SumMp4All', 'SumMp4Step', 'SumTextAll'):
         if is_audio_file(filePath):
             mp3FilePath = filePath
         else:
