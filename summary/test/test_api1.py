@@ -1,8 +1,10 @@
 import requests
-import json
 
 
 def test_media_endpoint():
+    """
+    mode 文本生成格式(normal:纯文本 timeline:带时间线文本 subtitle:字幕格式)
+    """
     url = "http://112.48.199.63:9898/media"
     data = {
         "audio_path": "/mnt/data/llch/media_path/00.mp4.mp3",
