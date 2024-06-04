@@ -30,7 +30,7 @@ summary/
 ```shell
 # 环境安装配置
 git clone https://github.com/aceliuchanghong/LLM-EASY-WEBUI.git
-# 配置好环境变量OPENAI_API_KEY,配置好需要的python虚拟环境(参见项目readme)
+# 配置好环境变量OPENAI_API_KEY(或者不用直接修改配置的apiKey),配置好需要的python虚拟环境(参见项目readme)
 # 我已经做好了,只需要激活就好了
 source activate myLLM_WEBUI
 cd LLM-EASY-WEBUI
@@ -66,7 +66,7 @@ cp /home/liuchanghong/faster-whisper-large-v3/*.so.* $HOME/anaconda3/envs/mySumm
 参数简短说明:
 # summaryType:SumMp4All,SumTextAll==>总体总结 SumMp4Step==>章节总结  
 # fileInfo==>视频说明,不是关键字
-# vi summary/config.py:
+# vi summary/config.py
 # 有一个音频模型文件需要提前下载好(hf的faster-whisper-large-v3),模型地址:model_size_or_path
 # file_default_path这个是指自己上传的文件路径,记得改 (/home/liuchanghong/media_files)
 # 如果使用的官方key,里面openai_api_base记得改下(模型也可以改一下) 

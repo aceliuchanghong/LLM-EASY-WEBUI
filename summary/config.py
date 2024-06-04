@@ -1,5 +1,7 @@
 llm_model_name = "gpt-4-turbo"
 openai_api_base = "https://api.xty.app/v1"
+apiKey = 'qwen:14b-gguf'
+max_tokens = 8112
 
 file_default_path = r'C:\Users\lawrence\Videos'
 model_size_or_path = r'C:\Users\lawrence\Documents\large_v3'
@@ -10,13 +12,14 @@ company_name = 'sotawork'
 LOG_LEVEL = "ERROR"
 db_path = "summary/media_sum.db"
 segment_length = 3500
+
 allSummaryPromptStart = """
-我希望你是一名专业的视频内容编辑,帮我用中文总结内容精华.请用一句简短的话总结梗概,仅内容即可,不要其他任何修饰词,大概100-150字左右,内容如下:
+我希望你是一名专业的视频内容编辑,帮我用中文总结内容精华.请用一句简短的话总结梗概,仅内容即可,不要其他任何修饰词,大概100-150字左右,内容如下:{begin}
 
 """
 allSummaryPromptEnd = """
 
-.注意!第一遍一定不完美,请反复考虑斟酌一下,如果你做的够完美,我愿意支付$10小费!
+{end}.注意!第一遍一定不完美,请反复考虑斟酌一下,如果你做的够完美,我愿意支付$10小费!
 """
 stepSummaryPromptStart = """
 你是一名专业的杂志社编辑,帮我总结内容,我将给出带时间戳的文本,完成以下几点要求
@@ -27,24 +30,24 @@ stepSummaryPromptStart = """
 天子之剑，有恶必杀，对恶有深深的敬畏，说明剑的使命。
 ```
 3.每个章节梗概是15-30个字,描述是30-60个字
-待总结的内容如下:
+待总结的内容如下:{begin}
 
 """
 stepSummaryPromptEnd = """
 
-.注意!第一遍一定不完美,请反复考虑斟酌一下,如果你做的够完美,我愿意支付$10小费!
+{end}.注意!第一遍一定不完美,请反复考虑斟酌一下,如果你做的够完美,我愿意支付$10小费!
 """
 
 allSummaryConnStart = """
 你是一名专业的杂志社编辑主管,我会给出某一个视频的不同分段总结,
 1.帮我合并内容精华,总结梗概,长度大概{待合并的内容}的1/3左右
 2.不要有多余描述,仅回答结果即可
-待合并的内容如下:
+待合并的内容如下:{begin}
 
 """
 allSummaryConnEnd = """
 
-.注意!第一遍一定不完美,请反复考虑斟酌一下,如果你做的够完美,我愿意支付$10小费!
+{end}.注意!第一遍一定不完美,请反复考虑斟酌一下,如果你做的够完美,我愿意支付$10小费!
 """
 
 stepSummaryConnStart = """
@@ -56,33 +59,34 @@ stepSummaryConnStart = """
 天子之剑，有恶必杀，对恶有深深的敬畏，说明剑的使命。
 ```
 3.不要有多余描述,仅回答结果即可
-待合并的内容如下:
+待合并的内容如下:{begin}
 
 """
 stepSummaryConnEnd = """
 
-.注意!第一遍一定不完美,请反复考虑斟酌一下,如果你做的够完美,我愿意支付$10小费!
+{end}.注意!第一遍一定不完美,请反复考虑斟酌一下,如果你做的够完美,我愿意支付$10小费!
 """
-
 
 textAllSummaryPromptStart = """
 我将给你提供一段会议内容，帮我整理成更规范的形式，包括会议的基本信息、目的和议题、内容摘要、决议、解决方案、行动事项、附件和参考信息等会议纪要信息
-内容如下:
+内容如下:{begin}
 
 """
 textAllSummaryPromptEnd = """
 
-.注意!第一遍一定不完美,请反复考虑斟酌一下,如果你做的够完美,我愿意支付$10小费!
+{end}.注意!第一遍一定不完美,请反复考虑斟酌一下
 """
 
 textAllSummaryConnStart = """
 我将给你提供一段或多段会议纪要内容,帮我做成一个更加规范的会议纪要
-其内容如下:
+要求:1.markdown格式
+2.不要输出任何除了结果的其他话
+其内容如下:{begin}
 
 """
 textAllSummaryConnEnd = """
 
-.注意!第一遍一定不完美,请反复考虑斟酌一下,如果你做的够完美,我愿意支付$10小费!
+{end}.注意!第一遍一定不完美,请反复考虑斟酌一下
 """
 
 create_table_sql = """
