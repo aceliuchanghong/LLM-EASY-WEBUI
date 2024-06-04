@@ -77,7 +77,7 @@ cp /home/liuchanghong/faster-whisper-large-v3/*.so.* $HOME/anaconda3/envs/mySumm
 
 ```shell
 # UI界面,不要传大视频,真的会卡掉的,掉了需要重拉,记得开端口
-nohup uvicorn ui:app --port 9898 > unicore.log &
+nohup uvicorn ui:app --port 9898 --host 0.0.0.0> unicore.log &
 (uvicorn ui:app --port 9898 --host 0.0.0.0)
 # 或者
 python ui.py

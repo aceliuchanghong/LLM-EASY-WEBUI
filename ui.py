@@ -2,7 +2,7 @@ import gradio as gr
 from smain import main
 from summary.util.check_db import excute_sqlite_sql
 from summary.util.mp3_from_mp4 import get_media_files
-from summary.util.text_from_mp3 import get_whisper_model
+from summary.util.text_from_mp3 import get_whisper_model, get_whisper_text
 from summary.config import (model_size_or_path,
                             file_default_path, company_name, create_table_sql)
 from fastapi import FastAPI
@@ -33,7 +33,19 @@ def doIt(summary_type, file_Path, file_get_type='upload', file_Info=None, re_run
     return main(summaryType, file_Path, fileInfo, whisperModel, reRun)
 
 
-# C:\Users\lawrence\AppData\Local\Temp\gradio
+from typing import Literal
+
+
+@app.post("/media")
+def getTextApi(audio_path: str,
+               initial_prompt: str,
+               mode: Literal['timeline', 'normal', 'subtitle']
+               ):
+    whisperModel = get_whisper_model(model_size_or_path)
+    transcription = get_whisper_text(whisperModel, audio_path, initial_prompt=initial_prompt, mode=mode)
+    return transcription
+
+
 @app.get("/")
 def create_chain_app():
     with gr.Blocks(title=company_name) as demo:
@@ -47,7 +59,7 @@ def create_chain_app():
 
             with gr.Row():
                 input_textbox = gr.Textbox(label='媒体关键字', scale=10)
-                input_type = gr.Dropdown(label='生成摘要类型', choices=['章节摘要', '总体摘要', '总体纪要'],
+                input_type = gr.Dropdown(label='生成摘要类型', choices=['总体摘要', '章节摘要', '总体纪要'],
                                          value='总体纪要',
                                          scale=2)
                 rerun_type = gr.Dropdown(label='是否重跑', choices=['否', '是'], value='否', scale=1)
