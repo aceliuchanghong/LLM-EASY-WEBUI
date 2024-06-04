@@ -116,6 +116,7 @@ def main(summaryType, filePath, fileInfo=None, whisperModel=None, reRun=False):
                                      PromptEnd=SummaryPrompt[summaryType][1])
     else:
         sumTextAns = sumText
+    sumTextAns = sumTextAns.replace("```", '')
     remark = "remark"
     print("结果:\n" + sumTextAns)
 
