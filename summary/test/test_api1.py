@@ -1,5 +1,5 @@
 import requests
-
+import time
 
 def test_media_endpoint():
     """
@@ -19,4 +19,8 @@ def test_media_endpoint():
 
 
 if __name__ == "__main__":
+    start = time.time()
     test_media_endpoint()
+    end = time.time()
+    print(end - start)
+
