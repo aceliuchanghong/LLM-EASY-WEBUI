@@ -10,6 +10,7 @@ conda create -n myLLM_WEBUI python=3.11
 conda activate myLLM_WEBUI
 pip install -r requirements.txt --proxy=127.0.0.1:10809
 watch -n 1 nvidia-smi
+nvitop
 ```
 
 ### Structure
