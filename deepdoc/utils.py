@@ -4,7 +4,8 @@ import inspect
 from logging.handlers import TimedRotatingFileHandler
 from threading import RLock
 
-PROJECT_BASE = r"C:\Users\lawrence\PycharmProjects\LLM-EASY-WEBUI"
+PROJECT_BASE = r"D:\aProject\py\LLM-EASY-WEBUI"
+# PROJECT_BASE = r"C:\Users\lawrence\PycharmProjects\LLM-EASY-WEBUI"
 all_codecs = [
     'utf-8', 'gb2312', 'gbk', 'utf_16', 'ascii', 'big5', 'big5hkscs',
     'cp037', 'cp273', 'cp424', 'cp437',
