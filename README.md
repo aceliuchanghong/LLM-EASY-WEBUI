@@ -24,14 +24,24 @@ LLM-EASY-WEBUI/
 ├── smain.py
 └── ui.py
 ```
-
-### docker install
+### start
 
 ```shell
 git clone https://github.com/aceliuchanghong/LLM-EASY-WEBUI.git
 cd LLM-EASY-WEBUI
-docker build -t LLMWebUI . --build-arg DEEPINFRA_API_KEY=my_secret_key
-docker run -d --name LLMWebUI -p 80:80 LLMWebUI
+source activate llm_uncensor
+pip install -r requirements.txt
+vi chatAll/config.py
+
+查看(sudo lsof -i :11434)
+LLM_MODEL_NAME = 'wangrongsheng/mistral-7b-v0.3-chinese-chat:latest'
+LLM_BASE_URL = 'http://127.0.0.1:11434/v1/'
+DEEPINFRA_API_KEY = 'wangrongsheng/mistral-7b-v0.3-chinese-chat:latest'
+EMBEDDING_MODEL = 'BAAI/bge-large-en-v1.5'
+file_default_path = '/home/administrator/ollama/LLM-EASY-WEBUI'
+# 删除这2行
+pywin32==306
+pywinpty==2.0.13
 ```
 
 ### 虚拟环境启动jupyter
