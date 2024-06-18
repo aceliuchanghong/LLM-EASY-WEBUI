@@ -4,14 +4,66 @@ import os
 from funasr import AutoModel
 import re
 import uvicorn
+from datetime import datetime, timedelta
+import time
+import threading
+import torch
 
 app = FastAPI()
+result_path = '/data/asr/result'
+video_path = '/data/asr/video'
+release_minutes = 10
+# 模型相关变量
+model = None
+last_access_time = datetime.now()
 
-# 提前加载模型
-model = AutoModel(model='/mnt/data/speech_paraformer-large-vad-punc-spk_asr_nat-zh-cn',
-                  vad_model='/mnt/data/speech_fsmn_vad_zh-cn-16k-common-pytorch',
-                  punc_model='/mnt/data/punc_ct-transformer_cn-en-common-vocab471067-large',
-                  spk_model="/mnt/data/speech_campplus_sv_zh-cn_16k-common")
+# 模型路径
+model_paths = {
+    'asr_model': '/data/asr/speech_paraformer-large-vad-punc-spk_asr_nat-zh-cn',
+    'vad_model': '/data/asr/speech_fsmn_vad_zh-cn-16k-common-pytorch',
+    'punc_model': '/data/asr/punc_ct-transformer_cn-en-common-vocab471067-large',
+    'spk_model': '/data/asr/speech_campplus_sv_zh-cn_16k-common'
+}
+
+
+# 加载模型函数
+def load_model():
+    global model
+    model = AutoModel(
+        model=model_paths['asr_model'],
+        vad_model=model_paths['vad_model'],
+        punc_model=model_paths['punc_model'],
+        spk_model=model_paths['spk_model']
+    )
+
+
+# 释放模型函数
+def release_model():
+    global model
+    if model is not None:
+        # 删除模型对象
+        del model
+        # 清空GPU缓存
+        torch.cuda.empty_cache()
+        model = None
+        print("Model released to free memory.")
+    else:
+        print("Model is already None.")
+
+
+# 后台任务函数：检查是否需要释放模型
+def monitor_inactivity():
+    global last_access_time
+    while True:
+        if model and datetime.now() - last_access_time > timedelta(minutes=release_minutes):
+            release_model()
+        time.sleep(30)  # 每30s检查一次
+
+
+# 启动后台任务
+monitor_thread = threading.Thread(target=monitor_inactivity)
+monitor_thread.daemon = True
+monitor_thread.start()
 
 
 def process_sentences(res, mode='normal'):
@@ -76,11 +128,16 @@ async def process_video(files: List[UploadFile] = File(...),
                         initial_prompt: str = Form("会议"),
                         mode: str = Form("normal")
                         ):
+    global last_access_time, model
+    last_access_time = datetime.now()
+    if model is None:
+        load_model()
+
     print(f'files:{files}, initial_prompt: {initial_prompt}, mode: {mode}')
     information = []
     for file in files:
         # 保存音视频文件
-        file_path = os.path.join('/mnt/data/video', file.filename)
+        file_path = os.path.join(video_path, file.filename)
         with open(file_path, "wb") as f:
             f.write(await file.read())
 
@@ -107,7 +164,7 @@ async def process_video(files: List[UploadFile] = File(...),
                 print(info)
                 information.append(info)
         # 将结果保存到文件
-        result_file_path = os.path.join('/mnt/data/result', f"{os.path.splitext(file.filename)[0]}.txt")
+        result_file_path = os.path.join(result_path, f"{os.path.splitext(file.filename)[0]}.txt")
         with open(result_file_path, 'w') as f:
             for item in res:
                 # 如果结果是字典对象，则转换为字符串
