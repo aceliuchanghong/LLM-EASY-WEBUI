@@ -8,7 +8,7 @@ def test_media_endpoint():
     path1 = r'C:\Users\liuch\Videos\test1.mp4'
     path2 = r'C:\Users\liuch\Videos\meeting_01.mp4'
     try:
-        files = [('files', ('test_video.mp4', open(path2, 'rb'), 'video/mp4'))]
+        files = [('files', ('test_video.mp4', open(path1, 'rb'), 'video/mp4'))]
         data = {
             'initial_prompt': '会议',
             'mode': 'timeline'
