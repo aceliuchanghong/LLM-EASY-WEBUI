@@ -1,16 +1,18 @@
 # way1
 from langchain_openai import ChatOpenAI
-from flagged.pass2 import deepseek
-from summary.config import llm_model_name
+import time
 
-llm = ChatOpenAI(model=llm_model_name,
-                 openai_api_base="https://api.xty.app/v1")
-
+start = time.time()
+llm = ChatOpenAI(model='qwen2',
+                 api_key='qwen2',
+                 openai_api_base="http://192.168.18.106:11434/v1/")
 print(llm.invoke("hello").content)
+print(llm.invoke("你好,帮我写一首歌").content)
+end = time.time()
+print('\n回答时间:', end - start)
 
 print(llm.get_num_tokens("你好"))
 print(llm.get_num_tokens("nihao"))
-print(llm.get_num_tokens("vxerbui"))
 
 # # way2
 # from openai import OpenAI
