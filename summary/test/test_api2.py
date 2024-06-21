@@ -7,8 +7,10 @@ def test_media_endpoint():
     url2 = "http://192.168.18.106:8083/video"
     path1 = r'C:\Users\liuch\Videos\test1.mp4'
     path2 = r'C:\Users\liuch\Videos\meeting_01.mp4'
+    path3 = r'D:\BaiduNetdiskDownload\15.wav'
     try:
         files = [('files', ('test_video.mp4', open(path1, 'rb'), 'video/mp4'))]
+        # files = [('files', ('00.wav', open(path3, 'rb'), 'media/wav'))]
         data = {
             'initial_prompt': '会议',
             'mode': 'timeline'
