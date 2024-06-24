@@ -4,6 +4,7 @@ import time
 import re
 import json
 import csv
+import argparse
 
 _instance = None
 
@@ -64,16 +65,12 @@ def get_QA(file_path, prompt=None):
     return qa_pairs
 
 
-if __name__ == '__main__':
+def main(args):
     start = time.time()
-    file_path_dir = r'D:\aProject\py\myDeepdoc\ocr_outputs'
-    start_suffix = '火炬电子书-2024-总第137期-新春特刊.pdf_'
-    suffix = '.txt'
-    go_over_dir = False
     ans = []
     null_text = []
-    my_ocr_list = get_files(file_path_dir, start_suffix, suffix, go_over_dir)
-    # my_ocr_list = ['D:/aProject/py/myDeepdoc/ocr_outputs/火炬电子书-2024-总第137期-新春特刊.pdf_0.jpg.txt']
+    my_ocr_list = get_files(args.file_path_dir, args.start_suffix, args.suffix, args.go_over_dir)
+    print(my_ocr_list)
     for i in range(0, len(my_ocr_list)):
         this_ans = get_QA(my_ocr_list[i])
         if len(this_ans) == 0:
@@ -84,12 +81,12 @@ if __name__ == '__main__':
         print(this_ans)
         ans += this_ans
     # 写入json
-    with open('QA.json', 'w', encoding='utf-8') as file:
+    with open(f'{args.generate_file}.json', 'w', encoding='utf-8') as file:
         json.dump(ans, file, ensure_ascii=False, indent=4)
     # 写入CSV
-    with open('QA.csv', mode='w', newline='', encoding='utf-8') as file:
+    with open(f'{args.generate_file}.csv', mode='w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
-        # 写入表头 writer.writerow(['instruction', 'output'])
+        writer.writerow(['instruction', 'output'])
         for item in ans:
             writer.writerow([item['instruction'], item['output']])
 
@@ -97,3 +94,21 @@ if __name__ == '__main__':
         print(null_text)
     end = time.time()
     print('\ncost:', end - start)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Process OCR outputs and generate QA files.')
+    parser.add_argument('--file_path_dir', type=str, default=r'D:\aProject\py\myDeepdoc\ocr_outputs',
+                        help='Directory path for OCR outputs')
+    parser.add_argument('--start_suffix', type=str, default='火炬电子书-2023-总第125期-新春特刊.pdf',
+                        help='Start suffix for files')
+    parser.add_argument('--suffix', type=str, default='.txt', help='File suffix')
+    parser.add_argument('--generate_file', type=str, required=True, default='2023QA',
+                        help='Base name for generated files')
+    parser.add_argument('--go_over_dir', type=bool, default=False, help='Flag to go over directory')
+    """
+    conda activate myLLM_WEBUI
+    python rag_stuff/getQAs.py --start_suffix 火炬电子书-2023-总第125期-新春特刊.pdf --generate_file 2023QA
+    """
+    args = parser.parse_args()
+    main(args)
