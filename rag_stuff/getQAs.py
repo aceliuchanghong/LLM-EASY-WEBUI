@@ -3,6 +3,7 @@ from langchain_openai import ChatOpenAI
 import time
 import re
 import json
+import csv
 
 _instance = None
 
@@ -72,19 +73,27 @@ if __name__ == '__main__':
     ans = []
     null_text = []
     my_ocr_list = get_files(file_path_dir, start_suffix, suffix, go_over_dir)
-
+    # my_ocr_list = ['D:/aProject/py/myDeepdoc/ocr_outputs/火炬电子书-2024-总第137期-新春特刊.pdf_0.jpg.txt']
     for i in range(0, len(my_ocr_list)):
         this_ans = get_QA(my_ocr_list[i])
-        if this_ans is None:
+        if len(this_ans) == 0:
             print("running again:", my_ocr_list[i])
             this_ans = get_QA(my_ocr_list[i])
-            if this_ans is None:
+            if len(this_ans) == 0:
                 null_text.append(my_ocr_list[i])
         print(this_ans)
         ans += this_ans
-
-    with open('QA_old.json', 'w', encoding='utf-8') as file:
+    # 写入json
+    with open('QA.json', 'w', encoding='utf-8') as file:
         json.dump(ans, file, ensure_ascii=False, indent=4)
-    print(null_text)
+    # 写入CSV
+    with open('QA.csv', mode='w', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        # 写入表头 writer.writerow(['instruction', 'output'])
+        for item in ans:
+            writer.writerow([item['instruction'], item['output']])
+
+    if len(null_text) > 0:
+        print(null_text)
     end = time.time()
     print('\ncost:', end - start)
