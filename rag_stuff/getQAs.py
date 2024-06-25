@@ -12,7 +12,7 @@ _instance = None
 def get_instance():
     global _instance
     if _instance is None:
-        _instance = ChatOpenAI(model='qwen2', api_key='qwen2', openai_api_base="http://192.168.18.106:11434/v1/")
+        _instance = ChatOpenAI(model='qwen2:72b', api_key='qwen2:72b', openai_api_base="http://112.48.199.202:11434/v1/")
     return _instance
 
 
@@ -100,7 +100,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process OCR outputs and generate QA files.')
     parser.add_argument('--file_path_dir', type=str, default=r'D:\aProject\py\myDeepdoc\ocr_outputs',
                         help='Directory path for OCR outputs')
-    parser.add_argument('--start_suffix', type=str, default='火炬电子书-2023-总第125期-新春特刊.pdf',
+    parser.add_argument('--start_suffix', type=str, default='火炬电子书-2023',
                         help='Start suffix for files')
     parser.add_argument('--suffix', type=str, default='.txt', help='File suffix')
     parser.add_argument('--generate_file', type=str, required=True, default='2023QA',
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     parser.add_argument('--go_over_dir', type=bool, default=False, help='Flag to go over directory')
     """
     conda activate myLLM_WEBUI
-    python rag_stuff/getQAs.py --start_suffix 火炬电子书-2023-总第125期-新春特刊.pdf --generate_file 2023QA
+    python rag_stuff/getQAs.py --start_suffix 火炬电子书-2023 --generate_file 2023QA
     """
     args = parser.parse_args()
     main(args)

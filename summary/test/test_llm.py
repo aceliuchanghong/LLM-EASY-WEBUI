@@ -3,9 +3,12 @@ from langchain_openai import ChatOpenAI
 import time
 
 start = time.time()
-llm = ChatOpenAI(model='qwen2',
-                 api_key='qwen2',
-                 openai_api_base="http://192.168.18.106:11434/v1/")
+# llm = ChatOpenAI(model='qwen2',
+#                  api_key='qwen2',
+#                  openai_api_base="http://192.168.18.106:11434/v1/")
+llm = ChatOpenAI(model='qwen2:72b',
+                 api_key='qwen2:72b',
+                 openai_api_base="http://112.48.199.202:11434/v1/")
 print(llm.invoke("hello").content)
 print(llm.invoke("你好,帮我写一首歌").content)
 end = time.time()
