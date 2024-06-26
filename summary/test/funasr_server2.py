@@ -16,6 +16,7 @@ release_minutes = 10
 # 模型相关变量
 model = None
 last_access_time = datetime.now()
+active_tasks = 0  # 计数器，表示当前正在进行的模型任务数量
 
 # 模型路径
 model_paths = {
@@ -39,8 +40,8 @@ def load_model():
 
 # 释放模型函数
 def release_model():
-    global model
-    if model is not None:
+    global model, active_tasks
+    if model is not None and active_tasks <= 0:
         # 删除模型对象
         del model
         # 清空GPU缓存
@@ -67,52 +68,57 @@ monitor_thread.start()
 
 
 def process_sentences(res, mode='normal'):
+    # 检查输入有效性
+    if not res or 'sentence_info' not in res[0]:
+        print("##################\n")
+        print(res)
+        print("##################\n")
+        return [(0, '没有人说话')] if mode == 'normal' else [{'text': '没有人说话', 'start': 0, 'end': 9999, 'spk': 0}]
+
     result = []
+    current_sentence = None
+    current_speaker = None
+
     if mode == 'normal':
-        current_speaker = None
-        current_sentence = None
         for sentence_info in res[0]['sentence_info']:
-            spe = sentence_info['spk']
+            speaker = sentence_info['spk']
             text = sentence_info['text']
-            if current_speaker is None or spe != current_speaker:
+
+            if current_speaker is None or speaker != current_speaker:
                 if current_sentence:
                     result.append((current_speaker, current_sentence))
-                current_speaker = spe
+                current_speaker = speaker
                 current_sentence = text
             else:
                 current_sentence += text
+
         if current_sentence:
             result.append((current_speaker, current_sentence))
-        return result
+
     elif mode == 'timeline':
-        # 初始化变量
-        current_spk = None
-        current_sentence = None
         for sentence_info in res[0]['sentence_info']:
-            # 检查当前说话人是否与上一句不同
-            if current_spk != sentence_info['spk']:
-                # 如果当前句子不为None，则将其添加到结果列表中
+            speaker = sentence_info['spk']
+            text = sentence_info['text']
+            start = sentence_info['start']
+            end = sentence_info['end']
+
+            if current_speaker != speaker:
                 if current_sentence:
                     result.append(current_sentence)
-                # 重置当前说话人和当前句子
-                current_spk = sentence_info['spk']
+                current_speaker = speaker
                 current_sentence = {
-                    'text': sentence_info['text'],
-                    'start': sentence_info['start'],
-                    'end': sentence_info['end'],
-                    'spk': sentence_info['spk']
+                    'text': text,
+                    'start': start,
+                    'end': end,
+                    'spk': speaker
                 }
             else:
-                # 更新当前句子的结束时间
-                current_sentence['end'] = sentence_info['end']
-                # 将当前句子的文本追加到当前句子文本后面
-                current_sentence['text'] += sentence_info['text']
-        # 确保最后一个句子被添加到结果列表中
+                current_sentence['end'] = end
+                current_sentence['text'] += text
+
         if current_sentence:
             result.append(current_sentence)
-        return result
-    else:
-        return ["Unsupported " + mode + " provide."]
+    return result
 
 
 def format_timestamp(timestamp):
@@ -129,59 +135,58 @@ async def process_video(files: List[UploadFile] = File(...),
                         mode: str = Form("normal"),
                         need_spk: bool = Form(True)
                         ):
-    global last_access_time, model
+    global last_access_time, model, active_tasks
     last_access_time = datetime.now()
     if model is None:
         load_model()
 
-    print(f'files:{files}, initial_prompt: {initial_prompt}, mode: {mode}')
+    print(f'files:{files}, initial_prompt: {initial_prompt}, mode: {mode}, need_spk: {need_spk}')
     information = []
-    for file in files:
-        # 保存音视频文件
-        file_path = os.path.join(video_path, file.filename)
-        with open(file_path, "wb") as f:
-            f.write(await file.read())
+    active_tasks += 1  # 增加活动任务计数器
+    try:
+        for file in files:
+            # 保存音视频文件
+            file_path = os.path.join(video_path, file.filename)
+            with open(file_path, "wb") as f:
+                f.write(await file.read())
 
-        # 进行识别操作
-        res = model.generate(input=file_path, batch_size_s=1000, hotword=initial_prompt)
+            # 进行识别操作
+            res = model.generate(input=file_path, batch_size_s=1000, hotword=initial_prompt)
 
-        chinese_punctuation_pattern = re.compile(r'[\s+\.\!\/_,$%^*(+\"\']+|[+——！，。？、~@#￥%……&*（）]+')
-        # 调用递归函数开始处理
-        processed_sentences = process_sentences(res, mode)
-        # 打印结果列表，并删除除了最后一句的中文标点
-        if mode == 'normal':
-            for speaker, sentence in processed_sentences:
-                cleaned_sentence = chinese_punctuation_pattern.sub('', sentence)
-                speak_head = ''
-                if need_spk:
-                    speak_head = 'spk' + str(speaker) + ":"
-                info = speak_head + cleaned_sentence
-                print(info)
-                information.append(info)
-        elif mode == 'timeline':
-            for _ in processed_sentences:
-                speaker = _['spk']
-                cleaned_sentence = chinese_punctuation_pattern.sub('', _['text'])
-                start = format_timestamp(_['start'])
-                end = format_timestamp(_['end'])
-                speak_head = ''
-                if need_spk:
-                    speak_head = 'spk' + str(speaker) + ":"
-                info = speak_head + "[" + start + ' -> ' + end + '] ' + cleaned_sentence
-                print(info)
-                information.append(info)
-        # 将结果保存到文件
-        result_file_path = os.path.join(result_path, f"{os.path.splitext(file.filename)[0]}.txt")
-        with open(result_file_path, 'w') as f:
-            for item in res:
-                # 如果结果是字典对象，则转换为字符串
-                if isinstance(item, dict):
-                    item = str(item)
-                f.write(str(item) + '\n')
+            chinese_punctuation_pattern = re.compile(r'[\s+\.\!\/_,$%^*(+\"\']+|[+——！，。？、~@#￥%……&*（）]+')
+            # 调用递归函数开始处理
+            processed_sentences = process_sentences(res, mode)
+            # 打印结果列表，并删除除了最后一句的中文标点
+            if mode == 'normal':
+                for speaker, sentence in processed_sentences:
+                    cleaned_sentence = chinese_punctuation_pattern.sub('', sentence)
+                    speak_head = f'spk{speaker}:' if need_spk else ''
+                    info = speak_head + cleaned_sentence
+                    print(info)
+                    information.append(info)
+            elif mode == 'timeline':
+                for _ in processed_sentences:
+                    speaker = _['spk']
+                    cleaned_sentence = chinese_punctuation_pattern.sub('', _['text'])
+                    start = format_timestamp(_['start'])
+                    end = format_timestamp(_['end'])
+                    speak_head = f'spk{speaker}:' if need_spk else ''
+                    info = speak_head + "[" + start + ' -> ' + end + '] ' + cleaned_sentence
+                    print(info)
+                    information.append(info)
+            # 将结果保存到文件
+            result_file_path = os.path.join(result_path, f"{os.path.splitext(file.filename)[0]}.txt")
+            with open(result_file_path, 'w') as f:
+                for item in res:
+                    # 如果结果是字典对象，则转换为字符串
+                    if isinstance(item, dict):
+                        item = str(item)
+                    f.write(str(item) + '\n')
 
-        # 删除音视频文件
-        os.remove(file_path)
-
+            # 删除音视频文件
+            os.remove(file_path)
+    finally:
+        active_tasks -= 1  # 减少活动任务计数器
     return {
         "message": "Processing complete",
         "information": information
