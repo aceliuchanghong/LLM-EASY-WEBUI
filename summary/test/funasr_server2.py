@@ -126,7 +126,8 @@ def format_timestamp(timestamp):
 @app.post("/video")
 async def process_video(files: List[UploadFile] = File(...),
                         initial_prompt: str = Form("会议"),
-                        mode: str = Form("normal")
+                        mode: str = Form("normal"),
+                        need_spk: bool = Form(True)
                         ):
     global last_access_time, model
     last_access_time = datetime.now()
@@ -151,7 +152,10 @@ async def process_video(files: List[UploadFile] = File(...),
         if mode == 'normal':
             for speaker, sentence in processed_sentences:
                 cleaned_sentence = chinese_punctuation_pattern.sub('', sentence)
-                info = 'spk' + str(speaker) + ":" + cleaned_sentence
+                speak_head = ''
+                if need_spk:
+                    speak_head = 'spk' + str(speaker) + ":"
+                info = speak_head + cleaned_sentence
                 print(info)
                 information.append(info)
         elif mode == 'timeline':
@@ -160,7 +164,10 @@ async def process_video(files: List[UploadFile] = File(...),
                 cleaned_sentence = chinese_punctuation_pattern.sub('', _['text'])
                 start = format_timestamp(_['start'])
                 end = format_timestamp(_['end'])
-                info = 'spk' + str(speaker) + ":[" + start + ' -> ' + end + '] ' + cleaned_sentence
+                speak_head = ''
+                if need_spk:
+                    speak_head = 'spk' + str(speaker) + ":"
+                info = speak_head + "[" + start + ' -> ' + end + '] ' + cleaned_sentence
                 print(info)
                 information.append(info)
         # 将结果保存到文件
