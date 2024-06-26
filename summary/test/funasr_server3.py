@@ -10,8 +10,8 @@ import threading
 import torch
 
 app = FastAPI()
-result_path = '/data/asr/result'
-video_path = '/data/asr/video'
+result_path = '/mnt/data/asr/result'
+video_path = '/mnt/data/asr/video'
 release_minutes = 10
 # 模型相关变量
 model = None
@@ -20,22 +20,27 @@ active_tasks = 0  # 计数器，表示当前正在进行的模型任务数量
 
 # 模型路径
 model_paths = {
-    'asr_model': '/data/asr/speech_paraformer-large-vad-punc-spk_asr_nat-zh-cn',
-    'vad_model': '/data/asr/speech_fsmn_vad_zh-cn-16k-common-pytorch',
-    'punc_model': '/data/asr/punc_ct-transformer_cn-en-common-vocab471067-large',
-    'spk_model': '/data/asr/speech_campplus_sv_zh-cn_16k-common'
+    'asr_model': '/mnt/data/asr/speech_paraformer-large-vad-punc-spk_asr_nat-zh-cn',
+    'vad_model': '/mnt/data/asr/speech_fsmn_vad_zh-cn-16k-common-pytorch',
+    'punc_model': '/mnt/data/asr/punc_ct-transformer_cn-en-common-vocab471067-large',
+    'spk_model': '/mnt/data/asr/speech_campplus_sv_zh-cn_16k-common'
 }
 
 
 # 加载模型函数
 def load_model():
     global model
+    # 设置设备为多GPU
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = AutoModel(
         model=model_paths['asr_model'],
         vad_model=model_paths['vad_model'],
         punc_model=model_paths['punc_model'],
         spk_model=model_paths['spk_model']
     )
+    if torch.cuda.device_count() > 1:
+        model = torch.nn.DataParallel(model)
+        model.to(device)
 
 
 # 释放模型函数
@@ -70,7 +75,7 @@ monitor_thread.start()
 def process_sentences(res, mode='normal'):
     # 检查输入有效性
     if not res or 'sentence_info' not in res[0]:
-        print("##################\n")
+        print("\n##################")
         print(res)
         print("##################\n")
         return [(0, '没有人说话')] if mode == 'normal' else [{'text': '没有人说话', 'start': 0, 'end': 9999, 'spk': 0}]
@@ -151,7 +156,7 @@ async def process_video(files: List[UploadFile] = File(...),
                 f.write(await file.read())
 
             # 进行识别操作
-            res = model.generate(input=file_path, batch_size_s=1000, hotword=initial_prompt)
+            res = model.module.generate(input=file_path, batch_size_s=1000, hotword=initial_prompt)
 
             chinese_punctuation_pattern = re.compile(r'[\s+\.\!\/_,$%^*(+\"\']+|[+——！，。？、~@#￥%……&*（）]+')
             # 调用递归函数开始处理
