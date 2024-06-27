@@ -5,6 +5,7 @@ import re
 import json
 import csv
 import argparse
+import concurrent.futures
 
 _instance = None
 
@@ -73,26 +74,36 @@ def get_QA(file_path, prompt=None):
     return qa_pairs
 
 
+def process_file(file, max_retries):
+    retries = 0
+    while retries < max_retries:
+        this_ans = get_QA(file)
+        if len(this_ans) != 0:
+            return this_ans
+        retries += 1
+        print(f"running again*{retries}:", file)
+    return []
+
+
 def main(args):
     start = time.time()
     ans = []
     null_text = []
     my_ocr_list = get_files(args.file_path_dir, args.start_suffix, args.suffix, args.go_over_dir)
     print(my_ocr_list)
-    for i in range(0, len(my_ocr_list)):
-        retries = 0
-        while retries < args.max_retries:
-            this_ans = get_QA(my_ocr_list[i])
-            if len(this_ans) != 0:
-                break
-            retries += 1
-            print(f"running again*{retries}:", my_ocr_list[i])
 
-            if len(this_ans) == 0:
-                null_text.append(my_ocr_list[i])
+    # 使用线程池执行并发任务
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        futures = {executor.submit(process_file, file, args.max_retries): file for file in my_ocr_list}
+        for future in concurrent.futures.as_completed(futures):
+            file = futures[future]  # 获取对应的文件名
+            this_ans = future.result()
+            if len(this_ans) != 0:
+                ans.extend(this_ans)
+                print(this_ans)
+            else:
+                null_text.append(file)
                 print(null_text)
-        print(this_ans)
-        ans += this_ans
 
     get_or_create_directory(args.generate_file)
     # 写入json
@@ -124,7 +135,7 @@ if __name__ == '__main__':
     parser.add_argument('--max_retries', type=int, default=3, help='retries')
     """
     conda activate myLLM_WEBUI
-    python rag_stuff/getQAs.py --start_suffix 火炬电子-1000 --generate_file rag_stuff/2023QA
+    python rag_stuff/getQAs.py --start_suffix 火炬电子书-2023 --generate_file rag_stuff/2023QA
     """
     args = parser.parse_args()
     main(args)
