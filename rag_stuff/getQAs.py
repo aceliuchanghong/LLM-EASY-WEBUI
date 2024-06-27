@@ -12,8 +12,16 @@ _instance = None
 def get_instance():
     global _instance
     if _instance is None:
-        _instance = ChatOpenAI(model='qwen2:72b', api_key='qwen2:72b', openai_api_base="http://112.48.199.202:11434/v1/")
+        _instance = ChatOpenAI(model='qwen2:72b', api_key='qwen2:72b',
+                               openai_api_base="http://112.48.199.202:11434/v1/")
     return _instance
+
+
+def get_or_create_directory(file_path):
+    directory = os.path.dirname(file_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    return directory
 
 
 def get_files(file_path_dir, start_suffix=None, suffix=None, go_over_dir=False):
@@ -54,9 +62,9 @@ def get_QA(file_path, prompt=None):
         file_content = file.read()
     llm = get_instance()
     if prompt is None:
-        prompt = ("你是一个专业的研究人员,帮我就以下内容生成适当数量的问题和对应答案,其问题和答案应该\n"
-                  "1.遵循以下格式:\nQ:<问题><换行>A:<答案>\n"
-                  "2.没有其他多余的符号和文字\n以下是具体内容：\n")
+        prompt = ("你是一位专业的研究人员，请根据以下内容生成一系列有价值的问题及其答案。要求如下:\n"
+                  "1.问题和答案的格式应为:\nQ:<问题><换行>A:<答案>\n"
+                  "2.避免使用任何额外的符号或文字\n以下是具体内容：\n")
     prompt_to_llm = prompt + file_content
 
     response = llm.invoke(prompt_to_llm).content
@@ -72,14 +80,21 @@ def main(args):
     my_ocr_list = get_files(args.file_path_dir, args.start_suffix, args.suffix, args.go_over_dir)
     print(my_ocr_list)
     for i in range(0, len(my_ocr_list)):
-        this_ans = get_QA(my_ocr_list[i])
-        if len(this_ans) == 0:
-            print("running again:", my_ocr_list[i])
+        retries = 0
+        while retries < args.max_retries:
             this_ans = get_QA(my_ocr_list[i])
+            if len(this_ans) != 0:
+                break
+            retries += 1
+            print(f"running again*{retries}:", my_ocr_list[i])
+
             if len(this_ans) == 0:
                 null_text.append(my_ocr_list[i])
+                print(null_text)
         print(this_ans)
         ans += this_ans
+
+    get_or_create_directory(args.generate_file)
     # 写入json
     with open(f'{args.generate_file}.json', 'w', encoding='utf-8') as file:
         json.dump(ans, file, ensure_ascii=False, indent=4)
@@ -106,9 +121,10 @@ if __name__ == '__main__':
     parser.add_argument('--generate_file', type=str, required=True, default='2023QA',
                         help='Base name for generated files')
     parser.add_argument('--go_over_dir', type=bool, default=False, help='Flag to go over directory')
+    parser.add_argument('--max_retries', type=int, default=3, help='retries')
     """
     conda activate myLLM_WEBUI
-    python rag_stuff/getQAs.py --start_suffix 火炬电子书-2023 --generate_file 2023QA
+    python rag_stuff/getQAs.py --start_suffix 火炬电子-1000 --generate_file rag_stuff/2023QA
     """
     args = parser.parse_args()
     main(args)
