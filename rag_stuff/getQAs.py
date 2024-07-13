@@ -13,7 +13,7 @@ _instance = None
 def get_instance():
     global _instance
     if _instance is None:
-        _instance = ChatOpenAI(model='qwen2:72b', api_key='qwen2:72b',
+        _instance = ChatOpenAI(model='qwen57b:latest', api_key='qwen2:72b',
                                openai_api_base="http://112.48.199.202:11434/v1/")
     return _instance
 
@@ -100,6 +100,7 @@ def main(args):
             this_ans = future.result()
             if len(this_ans) != 0:
                 ans.extend(this_ans)
+                print(file)
                 print(this_ans)
             else:
                 null_text.append(file)

@@ -1,19 +1,17 @@
 import requests
 import time
+import concurrent.futures
 
 
 def test_media_endpoint():
-    url = "http://112.48.199.197:8083/video"
-    url2 = "http://192.168.18.106:8083/video"
-    url3 = "http://112.48.199.202:8083/video"
-    path1 = r'C:\Users\liuch\Videos\meeting_2.mp4'
-    path2 = r'C:\Users\liuch\Videos\meeting_01.mp4'
-    path3 = r'D:\BaiduNetdiskDownload\15.wav'
-    path4 = r'C:\Users\liuch\AppData\Roaming\Tencent\WXWork\wwmapp\userdata\MeetingRecords\2024-06-21 09.57.05 AI周例会 694394837\meeting_01.mp4'
+    url3 = "http://112.48.199.7:8083/video"
+    path5= r'C:\Users\liuch\AppData\Roaming\Tencent\WXWork\wwmapp\userdata\MeetingRecords\2024-07-12 14.06.15 刘昌洪预定的会议 378308882\meeting_02.mp4'
     need_spk = True
+    file_path = path5
     try:
-        files = [('files', ('test_video.mp4', open(path4, 'rb'), 'video/mp4'))]
+        files = [('files', ('test_video.mp4', open(file_path, 'rb'), 'video/mp4'))]
         # files = [('files', ('00.wav', open(path3, 'rb'), 'media/wav'))]
+        # files = [('files', ('00.m4a', open(path5, 'rb'), 'media/m4a'))]
         data = {
             'initial_prompt': '会议',
             'mode': 'normal',
@@ -26,13 +24,23 @@ def test_media_endpoint():
         else:
             print("Error:", response.text, response.status_code)
     except FileNotFoundError:
-        print(f"Error: The file {path1} does not exist.")
+        print(f"Error: The file {file_path} does not exist.")
     except requests.exceptions.RequestException as e:
         print("Error:", e)
 
 
 if __name__ == "__main__":
     start = time.time()
-    test_media_endpoint()
+    num_requests = 1  # Number of concurrent requests
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_requests) as executor:
+        futures = [executor.submit(test_media_endpoint) for _ in range(num_requests)]
+
+        for future in concurrent.futures.as_completed(futures):
+            try:
+                future.result()
+                print(future.result())
+            except Exception as exc:
+                print(f"Generated an exception: {exc}")
     end = time.time()
     print('\n识别时间:', end - start)
