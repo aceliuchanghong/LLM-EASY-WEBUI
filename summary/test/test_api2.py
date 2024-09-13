@@ -5,7 +5,7 @@ import concurrent.futures
 
 def test_media_endpoint():
     url3 = "http://112.48.199.7:8083/video"
-    path5= r'C:\Users\liuch\AppData\Roaming\Tencent\WXWork\wwmapp\userdata\MeetingRecords\2024-07-12 14.06.15 刘昌洪预定的会议 378308882\meeting_02.mp4'
+    path5= r'D:\wechatWork\WXWork\1688857567577400\Cache\File\2024-09\video5886746794060999907.mp4'
     need_spk = True
     file_path = path5
     try:
@@ -13,8 +13,8 @@ def test_media_endpoint():
         # files = [('files', ('00.wav', open(path3, 'rb'), 'media/wav'))]
         # files = [('files', ('00.m4a', open(path5, 'rb'), 'media/m4a'))]
         data = {
-            'initial_prompt': '会议',
-            'mode': 'normal',
+            'initial_prompt': 'deepseek,语音',
+            'mode': 'timeline',
             'need_spk': need_spk
         }
         response = requests.post(url3, files=files, data=data)
